@@ -8188,14 +8188,21 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	/* global beforeEach */
 	/* global it */
 	/* global describe */
 
 	describe('Container class', function () {
-		describe('register function', function () {
+		describe('register(component: Function | Class, configuration: Object) function', function () {
+
+			var underTest = undefined;
+
+			beforeEach(function () {
+				underTest = new _container2.default();
+			});
+
 			it('should register a function without configuration when passing a function', function () {
 				// arrange
-				var underTest = new _container2.default();
 				var testFunction = function testFunction(parameter) {
 					return parameter;
 				};
@@ -8213,7 +8220,6 @@
 
 			it('should register multiple functions when chaining it', function () {
 				// arrange
-				var underTest = new _container2.default();
 				var testFunction = function testFunction(parameter) {
 					return parameter;
 				};
@@ -8228,6 +8234,91 @@
 				// assert
 				_chai.assert.equal(components.length, 2);
 			});
+
+			it('should register a function with constant positioned parameter when passing it with a configuration', function () {
+				// arrange
+				var testFunction = function testFunction(parameter) {
+					return parameter;
+				};
+
+				// act
+				underTest.register(testFunction, {
+					parameters: [1]
+				});
+				var components = underTest.registeredComponents();
+
+				// assert
+				_chai.assert.include(components, {
+					component: testFunction,
+					configuration: {
+						parameters: [1]
+					}
+				});
+			});
+		});
+
+		describe('resolve(component: Object | String) function', function () {
+			var testFunction = function testFunction(parameter) {
+				return parameter;
+			};
+
+			var underTest = undefined;
+
+			beforeEach(function () {
+				underTest = new _container2.default();
+			});
+
+			it('should resolve an object by reference when registering it with default configuration', function () {
+				// arrange
+				underTest.register(testFunction);
+
+				// act
+				var result = underTest.resolve(testFunction);
+
+				// assert
+				_chai.assert.strictEqual(result, testFunction);
+			});
+
+			it('should throw a not registered error when trying to resolve a not registered component', function () {
+				// arrange
+
+				// act
+				var callResolveFunction = function callResolveFunction() {
+					return underTest.resolve(testFunction);
+				};
+
+				// assert
+				_chai.assert.throws(callResolveFunction, Error, 'Trying to resolve a not registered component. Make sure every neccesary component has been registered before calling resolve function.');
+			});
+
+			it('should resolve a function with positioned parameter when registering it with positioned parameter', function () {
+				// arrange
+				underTest.register(testFunction, {
+					parameters: [1]
+				});
+
+				// act
+				var resolvedFunction = underTest.resolve(testFunction);
+
+				// assert
+				_chai.assert.equal(resolvedFunction(), 1);
+			});
+
+			it('should resolve a function with multiple positioned parameters when registering it with two positioned parameters', function () {
+				// arrange
+				var testFunction = function testFunction(a, b) {
+					return a + b;
+				};
+				underTest.register(testFunction, {
+					parameters: [1, 2]
+				});
+
+				// act
+				var resolvedFunction = underTest.resolve(testFunction);
+
+				// assert
+				_chai.assert.equal(resolvedFunction(), 3);
+			});
 		});
 	});
 
@@ -8235,7 +8326,7 @@
 /* 54 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -8255,7 +8346,7 @@
 		}
 
 		_createClass(Container, [{
-			key: "register",
+			key: 'register',
 			value: function register(component) {
 				var configuration = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -8266,9 +8357,59 @@
 				return this;
 			}
 		}, {
-			key: "registeredComponents",
+			key: 'registeredComponents',
 			value: function registeredComponents() {
 				return [].concat(_toConsumableArray(this.components));
+			}
+		}, {
+			key: 'resolveComponentByParameter',
+			value: function resolveComponentByParameter(component, parameters) {
+				var resolvedComponent = component;
+
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = parameters[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var parameter = _step.value;
+
+						resolvedComponent = component.bind(null, parameter);
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				return resolvedComponent;
+			}
+		}, {
+			key: 'resolve',
+			value: function resolve(component) {
+				var filteredComponents = this.components.filter(function (item) {
+					return item.component === component;
+				});
+
+				if (filteredComponents.length === 0) {
+					throw Error('Trying to resolve a not registered component. Make sure every neccesary component has been registered before calling resolve function.');
+				}
+				var _filteredComponents$ = filteredComponents[0];
+				var resolvedComponent = _filteredComponents$.component;
+				var resolvedConfiguration = _filteredComponents$.configuration;
+
+				if (!resolvedConfiguration.parameters) return resolvedComponent;
+
+				return this.resolveComponentByParameter(resolvedComponent, resolvedConfiguration.parameters);
 			}
 		}]);
 
