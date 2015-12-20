@@ -5,7 +5,7 @@ var BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 var testConfig = Object.assign({}, config, {
 	entry: {
-		specs: glob.sync('./specs/**/*.js').map(function(file) { return path.resolve(file); }),
+		specs: glob.sync('./specs/*.js').map(function(file) { return path.resolve(file); }),
 	},
 	
 	output: {

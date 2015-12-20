@@ -1,8 +1,8 @@
 /* global it */
 /* global describe */
 
-import ConstantValueResolver from 'constantValueResolver';
-import AbstractResolver from 'abstractResolver'; 
+import ConstantValueResolver from 'resolvers/constantValueResolver';
+import AbstractResolver from 'resolvers/abstractResolver'; 
 import { assert } from 'chai';
 
 describe('ConstantValueResolver type', function() {

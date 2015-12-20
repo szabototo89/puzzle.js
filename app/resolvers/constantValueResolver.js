@@ -1,4 +1,4 @@
-import AbstractResolver from 'abstractResolver';
+import AbstractResolver from 'resolvers/abstractResolver';
 
 export default class ConstantValueResolver extends AbstractResolver {
 	canResolve(parameterConfiguration) {

@@ -1,4 +1,4 @@
-import ComponentResolver from 'componentResolver';
+import ComponentResolver from 'resolvers/componentResolver';
 import { assert } from 'chai';
 
 describe('ComponentResolver class', function() {

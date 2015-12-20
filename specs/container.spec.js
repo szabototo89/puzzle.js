@@ -2,7 +2,7 @@
 /* global it */
 /* global describe */
 
-import ConstantValueResolver from 'constantValueResolver';
+import ConstantValueResolver from 'resolvers/constantValueResolver';
 import Container from 'container'; 
 import { assert } from 'chai';
 import React from 'react/addons';
@@ -203,5 +203,4 @@ describe('Container type', function() {
 			assert.equal(resolvedComponents[2](), 6, 'sumFunction() should return 6');
 		});
 	});
-	
 });

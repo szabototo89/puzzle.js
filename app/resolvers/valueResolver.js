@@ -1,4 +1,4 @@
-import AbstractResolver from 'abstractResolver';
+import AbstractResolver from 'resolvers/abstractResolver';
 
 export default class ValueResolver extends AbstractResolver {
 	canResolve(parameterConfiguration) {
@@ -7,7 +7,7 @@ export default class ValueResolver extends AbstractResolver {
   
   resolveArray(parameter, resolver) {
     return parameter;
-  } 
+  }
 
   resolveObject(parameter, resolver) {
     let result = { } 

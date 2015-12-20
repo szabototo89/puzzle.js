@@ -1,5 +1,5 @@
 /* global describe */
-import ValueResolver from 'valueResolver';
+import ValueResolver from 'resolvers/valueResolver';
 import { assert } from 'chai';
 
 describe('ValueResolver type', function() {
