@@ -10,8 +10,8 @@
     "clean": "./node_modules/.bin/trash build/**/*.*",
     "build": "npm run webpack -- --config webpack.config.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Tamás Szabó",
+  "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.3.21",
     "babel-loader": "^6.2.0",
