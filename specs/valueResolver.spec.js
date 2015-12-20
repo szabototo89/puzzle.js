@@ -1,3 +1,4 @@
+/* global describe */
 import ValueResolver from 'valueResolver';
 import { assert } from 'chai';
 
@@ -44,7 +45,7 @@ describe('ValueResolver type', function() {
 		
 		it('should resolve array literal as a constant when passing a classic array value', function() {
 			// arrange
-				const parameterConfiguration = {
+      const parameterConfiguration = {
 				value: [1, 2, 3]
 			};
 		
@@ -54,6 +55,5 @@ describe('ValueResolver type', function() {
 			// assert
 			assert.deepEqual(result, [1, 2, 3]);
 		});
-		
 	});
 });

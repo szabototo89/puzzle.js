@@ -95,8 +95,8 @@
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!G:\\Development\\Projects\\Javascript\\depends\\node_modules\\css-loader\\index.js!G:\\Development\\Projects\\Javascript\\depends\\node_modules\\mocha\\mocha.css", function() {
-			var newContent = require("!!G:\\Development\\Projects\\Javascript\\depends\\node_modules\\css-loader\\index.js!G:\\Development\\Projects\\Javascript\\depends\\node_modules\\mocha\\mocha.css");
+		module.hot.accept("!!G:\\Development\\Projects\\Javascript\\puzzle.js\\node_modules\\css-loader\\index.js!G:\\Development\\Projects\\Javascript\\puzzle.js\\node_modules\\mocha\\mocha.css", function() {
+			var newContent = require("!!G:\\Development\\Projects\\Javascript\\puzzle.js\\node_modules\\css-loader\\index.js!G:\\Development\\Projects\\Javascript\\puzzle.js\\node_modules\\mocha\\mocha.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -30298,6 +30298,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	/* global describe */
+
 	describe('ValueResolver type', function () {
 
 		var underTest = undefined;
@@ -30363,7 +30365,7 @@
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _abstractResolver = __webpack_require__(55);
@@ -30372,6 +30374,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -30379,29 +30383,79 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var ValueResolver = (function (_AbstractResolver) {
-		_inherits(ValueResolver, _AbstractResolver);
+	  _inherits(ValueResolver, _AbstractResolver);
 
-		function ValueResolver() {
-			_classCallCheck(this, ValueResolver);
+	  function ValueResolver() {
+	    _classCallCheck(this, ValueResolver);
 
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(ValueResolver).apply(this, arguments));
-		}
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ValueResolver).apply(this, arguments));
+	  }
 
-		_createClass(ValueResolver, [{
-			key: 'canResolve',
-			value: function canResolve(parameterConfiguration) {
-				return parameterConfiguration && parameterConfiguration.value !== undefined;
-			}
-		}, {
-			key: 'resolve',
-			value: function resolve(parameterConfiguration, resolver) {
-				var value = parameterConfiguration.value;
+	  _createClass(ValueResolver, [{
+	    key: 'canResolve',
+	    value: function canResolve(parameterConfiguration) {
+	      return parameterConfiguration && parameterConfiguration.value !== undefined;
+	    }
+	  }, {
+	    key: 'resolveArray',
+	    value: function resolveArray(parameter, resolver) {
+	      return parameter;
+	    }
+	  }, {
+	    key: 'resolveObject',
+	    value: function resolveObject(parameter, resolver) {
+	      var result = {};
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
-				return value;
-			}
-		}]);
+	      try {
+	        for (var _iterator = Object.keys(parameter)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var key = _step.value;
 
-		return ValueResolver;
+	          var value = resolver(parameter[key]);
+	          result = Object.assign({}, result, _defineProperty({}, key, value));
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      return result;
+	    }
+	  }, {
+	    key: 'resolve',
+	    value: function resolve(parameterConfiguration) {
+	      var resolver = arguments.length <= 1 || arguments[1] === undefined ? function (value) {
+	        return value;
+	      } : arguments[1];
+	      var parameter = parameterConfiguration.value;
+
+	      console.log(parameter);
+
+	      if (Array.isArray(parameter)) {
+	        return this.resolveArray(parameter, resolver);
+	      }
+
+	      if (parameter instanceof Object) {
+	        return this.resolveObject(parameter, resolver);
+	      }
+
+	      return resolver(parameter);
+	    }
+	  }]);
+
+	  return ValueResolver;
 	})(_abstractResolver2.default);
 
 	exports.default = ValueResolver;
