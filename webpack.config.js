@@ -1,11 +1,21 @@
 var path = require('path');
 
 module.exports = {
-	entry: path.resolve('src/index.js'),
+	entry: {
+		src: path.resolve('./app/index.js')
+	},
+	
+	context: path.resolve('./app'),
+	
+	resolve: {
+		root:[ path.resolve('./app'), path.resolve('./node_modules') ]
+	},
+	
 	output: {
-		path: path.resolve('app'),
+		path: path.resolve('build'),
 		filename: 'bundle.js'
 	},
+	
 	module: {
 		loaders: [
 			{ 
@@ -14,5 +24,6 @@ module.exports = {
 				loader: 'babel-loader?presets[]=react&presets[]=es2015'
 			}
 		]
-	}
+	},
+	plugins: []
 };

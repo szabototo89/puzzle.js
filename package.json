@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "./node_modules/.bin/webpack", 
+    "tdd": "./node_modules/.bin/webpack-dev-server --config webpack.test.config.js --content-base ./test",
+    "test": "npm run webpack -- --config webpack.test.config.js --watch",
     "clean": "./node_modules/.bin/trash build/**/*.*",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js"
+    "build": "npm run webpack -- --config webpack.config.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,9 +17,15 @@
     "babel-loader": "^6.2.0",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
+    "browser-sync": "^2.10.1",
+    "browser-sync-webpack-plugin": "^1.0.1",
+    "chai": "^3.4.1",
+    "glob": "^6.0.1",
+    "mocha": "^2.3.4",
     "mocha-loader": "^0.7.1",
     "trash-cli": "^1.2.0",
-    "webpack": "^1.12.9"
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
   },
   "dependencies": {
     "react": "^0.14.3",
