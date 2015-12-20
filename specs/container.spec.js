@@ -2,18 +2,32 @@
 /* global it */
 /* global describe */
 
+import ConstantValueResolver from 'constantValueResolver';
 import Container from 'container'; 
 import { assert } from 'chai';
+import React from 'react/addons';
+import jsdom from 'mocha-jsdom';
 
-describe('Container class', function() {
+describe('Container type', function() {
+	
+	const constant = function(value) {
+		return {
+			constant: value
+		};
+	};
+	
+	const resolve = function(value) {
+		return { resolveComponent: value };
+	};
+	
+	let underTest;
+	
+	beforeEach(function() {
+		const constantValueResolver = new ConstantValueResolver(); 
+		underTest = new Container([ constantValueResolver ]);
+	});
+	
 	describe('register(component: Function | Class, configuration: Object) function', function() {
-		
-		let underTest;
-		
-		beforeEach(function() {
-			underTest = new Container();
-		});
-		
 		it('should register a function without configuration when passing a function', function() {
 			// arrange
 			const testFunction = (parameter) => parameter; 
@@ -49,7 +63,7 @@ describe('Container class', function() {
 		
 			// act
 			underTest.register(testFunction, {
-				parameters: [ 1 ]
+				parameters: [ constant(1) ]
 			});
 			const components = underTest.registeredComponents();
 		
@@ -57,7 +71,7 @@ describe('Container class', function() {
 			assert.include(components, {
 				component: testFunction, 
 				configuration: {
-					parameters: [ 1 ]
+					parameters: [ constant(1) ]
 				}
 			});
 		});
@@ -66,11 +80,7 @@ describe('Container class', function() {
 	describe('resolve(component: Object | String) function', function() {
 		const testFunction = (parameter) => parameter;
 		
-		let underTest;
-		
-		beforeEach(function() {
-			underTest = new Container();
-		})
+		jsdom();	// initialize jsdom
 		
 		it('should resolve an object by reference when registering it with default configuration', function() {
 			// arrange
@@ -96,7 +106,7 @@ describe('Container class', function() {
 		it('should resolve a function with positioned parameter when registering it with positioned parameter', function() {
 			// arrange
 			underTest.register(testFunction, {
-				parameters: [ 1 ]
+				parameters: [ constant(1) ]
 			});
 		
 			// act
@@ -109,8 +119,9 @@ describe('Container class', function() {
 		it('should resolve a function with multiple positioned parameters when registering it with two positioned parameters', function() {
 			// arrange
 			const testFunction = (a, b) => a + b;
+			
 			underTest.register(testFunction, {
-				parameters: [ 1, 2 ]
+				parameters: [ constant(1), constant(2) ]
 			});
 		
 			// act
@@ -119,5 +130,78 @@ describe('Container class', function() {
 			// assert
 			assert.equal(resolvedFunction(), 3);
 		});
+		
+		it('should resolve a function with another registered function when the first parameter refers to another registered component', function() {
+			// arrange
+			const id = value => value;
+			const testFunction = (func, b) => func() + b;
+			
+			underTest.register(id, { 
+					parameters: [ constant(2) ]
+				})
+				.register(testFunction, {
+					parameters: [ resolve(id), constant(1) ]
+				});
+		
+			// act
+			const resolvedFunction = underTest.resolve(testFunction);
+		
+			// assert
+			assert.equal(resolvedFunction(), 3);
+		});
+		
+		it('should resolve a stateless React component when passing a number to construct it', function() {
+			// arrange'
+			const TestUtils = React.addons.TestUtils;
+			const DummyComponent = (props) => {
+				return <span>{props.number}</span>;
+			};
+			const TestComponent = (number, props) => {
+				return <DummyComponent number={number} {...props} />;
+			};
+			const renderer = TestUtils.createRenderer();
+			
+			underTest.register(TestComponent, {
+				parameters: [ constant(3) ]
+			});
+		
+			// act
+			const ResolvedComponent = underTest.resolve(TestComponent);
+			renderer.render(<ResolvedComponent />);
+			const component = renderer.getRenderOutput();
+		
+			// assert
+			assert.deepEqual(component, <DummyComponent number={3} />);
+		});
 	});
+	
+	describe('resolveAll() function', function() {
+		it('should resolve all registered components', function() {
+			// arrange
+			const id = (parameter) => parameter;
+			const sum = (a, b) => a + b;
+			const sumFunction = (func, b) => func() + b;
+			
+			underTest
+				.register(id, {
+					parameters: [ constant(2) ],
+				})
+				.register(sum, {
+					parameters: [ constant(1), constant(2) ]
+				})
+				.register(sumFunction, {
+					parameters: [ resolve(sum), 3 ]
+				});
+		
+			// act
+			const resolvedComponents = underTest.resolveAll();
+		
+			// assert
+			assert.equal(resolvedComponents.length, 3);
+			assert.equal(resolvedComponents[0](), 2, 'id() should return 2'); 
+			assert.equal(resolvedComponents[1](), 3, 'sum() should return 3');
+			assert.equal(resolvedComponents[2](), 6, 'sumFunction() should return 6');
+		});
+	});
+	
 });

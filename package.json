@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "webpack": "./node_modules/.bin/webpack", 
+    "webpack": "./node_modules/.bin/webpack",
     "tdd": "./node_modules/.bin/webpack-dev-server --config webpack.test.config.js --content-base ./test",
     "test": "npm run webpack -- --config webpack.test.config.js --watch",
     "clean": "./node_modules/.bin/trash build/**/*.*",
@@ -21,8 +21,11 @@
     "browser-sync-webpack-plugin": "^1.0.1",
     "chai": "^3.4.1",
     "glob": "^6.0.1",
+    "jsdom": "^7.2.1",
     "mocha": "^2.3.4",
+    "mocha-jsdom": "^1.0.0",
     "mocha-loader": "^0.7.1",
+    "react-tools": "^0.13.3",
     "trash-cli": "^1.2.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"

@@ -1,5 +1,6 @@
 export default class Container {
-	constructor() {
+	constructor(resolvers = []) {
+		this.resolvers = resolvers;
 		this.components = [];
 	}
 	
@@ -14,15 +15,26 @@ export default class Container {
 	registeredComponents() {
 		return [ ...this.components ];
 	}
-	
-	resolveComponentByParameter(component, parameters) {
-		let resolvedComponent = component;
-		
-		for (const parameter of parameters) {
-			resolvedComponent = component.bind(null, parameter);
+
+	getParameterValue(parameterConfiguration) {
+		for (const resolver of this.resolvers) {
+			if (resolver.canResolve(parameterConfiguration)) {
+				return resolver.resolve(parameterConfiguration, this);
+			}	
 		}
 		
-		return resolvedComponent;
+		if (parameterConfiguration.resolveComponent) {
+			return this.resolve(parameterConfiguration.resolveComponent);
+		}
+		
+		return parameterConfiguration;
+	}
+	
+	resolveComponentByParameter(component, parameters) {
+		return parameters.reduce(
+			(resolvedComponent, parameter) => resolvedComponent.bind(null, this.getParameterValue(parameter)), 
+			component
+		);
 	}
 	
 	resolve(component) {
@@ -34,7 +46,10 @@ export default class Container {
 		const { component: resolvedComponent, configuration: resolvedConfiguration } = filteredComponents[0];
 		
 		if (!resolvedConfiguration.parameters) return resolvedComponent;
-		
 		return this.resolveComponentByParameter(resolvedComponent, resolvedConfiguration.parameters);
+	}
+	
+	resolveAll() {
+		return this.components.reduce((components, config) => [ ...components, this.resolve(config.component) ], []);
 	}
 }
