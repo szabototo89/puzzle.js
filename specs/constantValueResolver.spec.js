@@ -3,6 +3,7 @@
 
 import ConstantValueResolver from 'resolvers/constantValueResolver';
 import AbstractResolver from 'resolvers/abstractResolver'; 
+import { Constant } from 'parameterConfigurations';
 import { assert } from 'chai';
 
 describe('ConstantValueResolver type', function() {
@@ -19,7 +20,7 @@ describe('ConstantValueResolver type', function() {
 		it('should return true when passing an object value which contains constant key', function() {
 			// arrange
 			const underTest = new ConstantValueResolver();
-			const config = { constant: 1 }; 
+			const config = new Constant(1); 
 		
 			// act
 			const result = underTest.canResolve(config);
@@ -45,7 +46,7 @@ describe('ConstantValueResolver type', function() {
 		it('should return constant value when passing a proper parameterConfiguration value', function() {
 			// arrange
 			const underTest = new ConstantValueResolver();
-			const config = { constant: 32 };
+			const config = new Constant(32);
 		
 			// act
 			const result = underTest.resolve(config);

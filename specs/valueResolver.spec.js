@@ -1,5 +1,6 @@
 /* global describe */
 import ValueResolver from 'resolvers/valueResolver';
+import { Value } from 'parameterConfigurations';
 import { assert } from 'chai';
 
 describe('ValueResolver type', function() {
@@ -13,11 +14,18 @@ describe('ValueResolver type', function() {
 	describe('canResolve() function', function() {
 		it('should return true when passed configuration contains value key', function() {
 			// arrange
-			const parameterConfiguration = {
-				value: {
-					'hello': 'world'	
-				}
-			};
+			const parameterConfiguration = new Value({ 'hello': 'world'	});
+		
+			// act
+			const result = underTest.canResolve(parameterConfiguration);
+		
+			// assert
+			assert.isTrue(result);
+		});
+    
+    it('should return true when passed configuration contains an array', function() {
+			// arrange
+			const parameterConfiguration = new Value([1, 2, 3]);
 		
 			// act
 			const result = underTest.canResolve(parameterConfiguration);
@@ -30,11 +38,7 @@ describe('ValueResolver type', function() {
 	describe('resolve() function', function() {
 		it('should resolve object literal as a constant when passing a classic object literal', function() {
 			// arrange
-			const parameterConfiguration = {
-				value: {
-					'hello': 'world'
-				}
-			};
+			const parameterConfiguration = new Value({ 'hello': 'world' });
 		
 			// act
 			const result = underTest.resolve(parameterConfiguration);
@@ -45,15 +49,24 @@ describe('ValueResolver type', function() {
 		
 		it('should resolve array literal as a constant when passing a classic array value', function() {
 			// arrange
-      const parameterConfiguration = {
-				value: [1, 2, 3]
-			};
+      const parameterConfiguration = new Value([1, 2, 3]);
 		
 			// act
 			const result = underTest.resolve(parameterConfiguration);
 		
 			// assert
 			assert.deepEqual(result, [1, 2, 3]);
+		});
+    
+    it('should resolve object literal as an inner constant value when passing an object literal', function() {
+			// arrange
+			const parameterConfiguration = new Value({ 'hello': new Value('world') });
+		
+			// act
+			const result = underTest.resolve(parameterConfiguration);
+		
+			// assert
+			assert.deepEqual(result, { 'hello': 'world' });
 		});
 	});
 });

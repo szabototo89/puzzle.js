@@ -3,6 +3,7 @@
 /* global describe */
 
 import ConstantValueResolver from 'resolvers/constantValueResolver';
+import { Constant, Value } from 'parameterConfigurations';
 import Container from 'container'; 
 import { assert } from 'chai';
 import React from 'react/addons';
@@ -11,9 +12,7 @@ import jsdom from 'mocha-jsdom';
 describe('Container type', function() {
 	
 	const constant = function(value) {
-		return {
-			constant: value
-		};
+		return new Constant(value);
 	};
 	
 	const resolve = function(value) {

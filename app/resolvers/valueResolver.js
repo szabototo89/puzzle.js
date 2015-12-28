@@ -1,18 +1,35 @@
 import AbstractResolver from 'resolvers/abstractResolver';
+import { Value } from 'parameterConfigurations';
 
 export default class ValueResolver extends AbstractResolver {
 	canResolve(parameterConfiguration) {
-		return parameterConfiguration && parameterConfiguration.value !== undefined;
+		return parameterConfiguration && 
+           Object.getOwnPropertyNames(parameterConfiguration)
+                 .some(propertyName => propertyName === 'value');
 	}
   
-  resolveArray(parameter, resolver) {
+  resolveBySpecifiedResolvers(parameter, resolvers) {
+    if (resolvers.some(resolver => !(resolver instanceof AbstractResolver))) {
+      throw new Error('Resolver must be extended from AbstractResolver');
+    }
+    
+    for (const resolver of resolvers) {
+      if (resolver.canResolve(parameter)) {
+        return resolver.resolve(parameter, resolvers);
+      }
+    }
+    
+    return null;
+  }
+  
+  resolveArray(parameter, resolvers) {
     return parameter;
   }
 
-  resolveObject(parameter, resolver) {
+  resolveObject(parameter, resolvers) {
     let result = { } 
     for (const key of Object.keys(parameter)) {
-      const value = resolver(parameter[key]);
+      const value = this.resolveBySpecifiedResolvers(parameter[key], resolvers) || parameter[key];
       result = Object.assign({ }, result, {
         [key]: value
       });
@@ -20,19 +37,21 @@ export default class ValueResolver extends AbstractResolver {
 		return result;
   }
 	
-	resolve(parameterConfiguration, resolver = (value) => value) {
+	resolve(parameterConfiguration, resolvers = [ this ]) {
 		const { value: parameter } = parameterConfiguration;
     
-    console.log(parameter);
-    
     if (Array.isArray(parameter)) {
-      return this.resolveArray(parameter, resolver);  
+      return this.resolveArray(parameter, resolvers);  
+    }
+    
+    if (parameter.constructor === Value) {
+      return this.resolve(parameter, resolvers);
     }
     
     if (parameter instanceof Object) {
-      return this.resolveObject(parameter, resolver);
+      return this.resolveObject(parameter, resolvers);
     }
     
-    return resolver(parameter);
+    return this.resolveBySpecifiedResolvers(parameter, resolvers);
 	}
 } 

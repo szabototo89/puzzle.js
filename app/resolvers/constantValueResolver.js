@@ -1,11 +1,12 @@
 import AbstractResolver from 'resolvers/abstractResolver';
+import { Constant } from 'parameterConfigurations';
 
 export default class ConstantValueResolver extends AbstractResolver {
 	canResolve(parameterConfiguration) {
-		return parameterConfiguration && parameterConfiguration.constant !== undefined;
+		return parameterConfiguration && parameterConfiguration instanceof Constant;
 	}
 	
 	resolve(parameterConfiguration, resolver) {
-		return parameterConfiguration.constant;	
+		return parameterConfiguration.value;	
 	}
 }
