@@ -68,5 +68,16 @@ describe('ValueResolver type', function() {
 			// assert
 			assert.deepEqual(result, { 'hello': 'world' });
 		});
+    
+    it('should resolve object literal as an deep inner constant value when passing an object literal', function() {
+			// arrange
+			const parameterConfiguration = new Value({ 'hello': new Value({ 'beautiful': new Value('world') }) });
+		
+			// act
+			const result = underTest.resolve(parameterConfiguration);
+		
+			// assert
+			assert.deepEqual(result, { 'hello': { 'beautiful': 'world' } });
+		});
 	});
 });

@@ -47,7 +47,8 @@
 	__webpack_require__(1);
 	__webpack_require__(52);
 	__webpack_require__(57);
-	module.exports = __webpack_require__(235);
+	__webpack_require__(235);
+	module.exports = __webpack_require__(241);
 
 
 /***/ },
@@ -30342,7 +30343,275 @@
 
 	'use strict';
 
-	var _valueResolver = __webpack_require__(237);
+	var _puzzleContainer = __webpack_require__(237);
+
+	var _puzzleContainer2 = _interopRequireDefault(_puzzleContainer);
+
+	var _react = __webpack_require__(239);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _chai = __webpack_require__(12);
+
+	var _containerDefinitions = __webpack_require__(240);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	describe('PuzzleContainer class', function () {
+	  var LabelStub = (function (_React$Component) {
+	    _inherits(LabelStub, _React$Component);
+
+	    function LabelStub() {
+	      _classCallCheck(this, LabelStub);
+
+	      return _possibleConstructorReturn(this, Object.getPrototypeOf(LabelStub).apply(this, arguments));
+	    }
+
+	    return LabelStub;
+	  })(_react2.default.Component);
+
+	  var TextBoxStub = (function (_React$Component2) {
+	    _inherits(TextBoxStub, _React$Component2);
+
+	    function TextBoxStub() {
+	      _classCallCheck(this, TextBoxStub);
+
+	      return _possibleConstructorReturn(this, Object.getPrototypeOf(TextBoxStub).apply(this, arguments));
+	    }
+
+	    return TextBoxStub;
+	  })(_react2.default.Component);
+
+	  var HeaderStub = (function (_React$Component3) {
+	    _inherits(HeaderStub, _React$Component3);
+
+	    function HeaderStub() {
+	      _classCallCheck(this, HeaderStub);
+
+	      return _possibleConstructorReturn(this, Object.getPrototypeOf(HeaderStub).apply(this, arguments));
+	    }
+
+	    return HeaderStub;
+	  })(_react2.default.Component);
+
+	  describe('getConfiguration() function', function () {
+	    it('should get configuration through constructor parameters when a complex configuration has been passed', function () {
+	      // arrange
+	      var underTest = new _puzzleContainer2.default(_react2.default.createElement(
+	        _containerDefinitions.Component,
+	        { type: LabelStub, lifeTime: 'singleton' },
+	        _react2.default.createElement(
+	          _containerDefinitions.Constructor,
+	          null,
+	          _react2.default.createElement(
+	            _containerDefinitions.Argument,
+	            { position: '0' },
+	            _react2.default.createElement(_containerDefinitions.Component, { type: TextBoxStub }),
+	            _react2.default.createElement(_containerDefinitions.Component, { type: HeaderStub })
+	          )
+	        )
+	      ));
+	      // act
+	      var result = underTest.getConfiguration();
+
+	      // assert
+	      _chai.assert.isDefined(result);
+	      _chai.assert.deepEqual(result, {
+	        type: LabelStub,
+	        lifeTime: "singleton",
+	        children: [{
+	          children: [{
+	            position: 0,
+	            children: [{ type: TextBoxStub, lifeTime: undefined }, { type: HeaderStub, lifeTime: undefined }]
+	          }]
+	        }]
+	      });
+	    });
+
+	    it('should get component configuration through constructor parameters when constant value has been passed', function () {
+	      // arrange
+	      var underTest = new _puzzleContainer2.default(_react2.default.createElement(
+	        _containerDefinitions.Component,
+	        { type: LabelStub, lifeTime: 'singleton' },
+	        _react2.default.createElement(
+	          _containerDefinitions.Constructor,
+	          null,
+	          _react2.default.createElement(
+	            _containerDefinitions.Argument,
+	            { position: '0' },
+	            _react2.default.createElement(_containerDefinitions.Constant, { value: 'Hello World!' })
+	          )
+	        )
+	      ));
+
+	      // act
+	      var result = underTest.getConfiguration();
+
+	      // assert
+	      _chai.assert.isDefined(result);
+	      _chai.assert.deepEqual(result, {
+	        type: LabelStub,
+	        lifeTime: "singleton",
+	        children: [{
+	          children: [{
+	            position: 0,
+	            children: [{ value: "Hello World!" }]
+	          }]
+	        }]
+	      });
+	    });
+	  });
+	});
+
+/***/ },
+/* 237 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _reactConfigurationResolver = __webpack_require__(244);
+
+	var _reactConfigurationResolver2 = _interopRequireDefault(_reactConfigurationResolver);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var PuzzleContainer = (function () {
+	  function PuzzleContainer(configuration) {
+	    var resolver = arguments.length <= 1 || arguments[1] === undefined ? new _reactConfigurationResolver2.default() : arguments[1];
+
+	    _classCallCheck(this, PuzzleContainer);
+
+	    this.configuration = resolver.resolve(configuration);
+	  }
+
+	  _createClass(PuzzleContainer, [{
+	    key: 'getConfiguration',
+	    value: function getConfiguration() {
+	      return Object.assign({}, this.configuration);
+	    }
+	  }]);
+
+	  return PuzzleContainer;
+	})();
+
+	exports.default = PuzzleContainer;
+
+/***/ },
+/* 238 */,
+/* 239 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = __webpack_require__(66);
+
+
+/***/ },
+/* 240 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Constant = exports.Argument = exports.Constructor = exports.Component = undefined;
+
+	var _react = __webpack_require__(239);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Component = exports.Component = function Component(_ref) {
+	  var type = _ref.type;
+	  var lifeTime = _ref.lifeTime;
+	  var children = _ref.children;
+
+	  _classCallCheck(this, Component);
+
+	  this.type = type;
+	  this.lifeTime = lifeTime;
+
+	  if (children) {
+	    this.children = children;
+	  }
+	};
+
+	var Constructor = exports.Constructor = function Constructor(_ref2) {
+	  var children = _ref2.children;
+
+	  _classCallCheck(this, Constructor);
+
+	  if (children) {
+	    this.children = children;
+	  }
+	};
+
+	var Argument = exports.Argument = function Argument(_ref3) {
+	  var position = _ref3.position;
+	  var children = _ref3.children;
+
+	  _classCallCheck(this, Argument);
+
+	  this.position = Number.parseInt(position);
+	  if (children) {
+	    this.children = children;
+	  }
+	};
+
+	var Constant = exports.Constant = function Constant(_ref4) {
+	  var value = _ref4.value;
+
+	  _classCallCheck(this, Constant);
+
+	  this.value = value;
+	};
+
+/***/ },
+/* 241 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	__webpack_require__(2);
+	mocha.setup("bdd");
+	__webpack_require__(242);
+	__webpack_require__(50);
+	if (false) {
+		module.hot.accept();
+		module.hot.dispose(function () {
+			mocha.suite.suites.length = 0;
+			var stats = document.getElementById('mocha-stats');
+			var report = document.getElementById('mocha-report');
+			stats.parentNode.removeChild(stats);
+			report.parentNode.removeChild(report);
+		});
+	}
+
+/***/ },
+/* 242 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _valueResolver = __webpack_require__(243);
 
 	var _valueResolver2 = _interopRequireDefault(_valueResolver);
 
@@ -30417,11 +30686,22 @@
 				// assert
 				_chai.assert.deepEqual(result, { 'hello': 'world' });
 			});
+
+			it('should resolve object literal as an deep inner constant value when passing an object literal', function () {
+				// arrange
+				var parameterConfiguration = new _parameterConfigurations.Value({ 'hello': new _parameterConfigurations.Value({ 'beautiful': new _parameterConfigurations.Value('world') }) });
+
+				// act
+				var result = underTest.resolve(parameterConfiguration);
+
+				// assert
+				_chai.assert.deepEqual(result, { 'hello': { 'beautiful': 'world' } });
+			});
 		});
 	}); /* global describe */
 
 /***/ },
-/* 237 */
+/* 243 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30500,7 +30780,7 @@
 	        }
 	      }
 
-	      return null;
+	      return parameter;
 	    }
 	  }, {
 	    key: 'resolveArray',
@@ -30519,7 +30799,7 @@
 	        for (var _iterator2 = Object.keys(parameter)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 	          var key = _step2.value;
 
-	          var value = this.resolveBySpecifiedResolvers(parameter[key], resolvers) || parameter[key];
+	          var value = this.resolveBySpecifiedResolvers(parameter[key], resolvers);
 	          result = Object.assign({}, result, _defineProperty({}, key, value));
 	        }
 	      } catch (err) {
@@ -30565,6 +30845,58 @@
 	})(_abstractResolver2.default);
 
 	exports.default = ValueResolver;
+
+/***/ },
+/* 244 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var ReactConfigurationResolver = (function () {
+	  function ReactConfigurationResolver() {
+	    _classCallCheck(this, ReactConfigurationResolver);
+	  }
+
+	  _createClass(ReactConfigurationResolver, [{
+	    key: "resolveChildren",
+	    value: function resolveChildren(children) {
+	      var _this = this;
+
+	      if (!children) return null;
+	      if (Array.isArray(children)) {
+	        return children.map(function (child) {
+	          return _this.resolve(child);
+	        });
+	      }
+
+	      return [this.resolve(children)];
+	    }
+	  }, {
+	    key: "resolve",
+	    value: function resolve(definition) {
+	      var type = definition.type;
+	      var props = definition.props;
+
+	      var args = Object.assign({}, props, {
+	        children: this.resolveChildren(props.children)
+	      });
+
+	      return new type(args);
+	    }
+	  }]);
+
+	  return ReactConfigurationResolver;
+	})();
+
+	exports.default = ReactConfigurationResolver;
 
 /***/ }
 /******/ ]);
