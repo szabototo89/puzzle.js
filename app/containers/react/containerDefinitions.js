@@ -1,5 +1,11 @@
 import React from 'react';
 
+export class Components {
+  constructor({ children }) {
+    this.children = children;
+  }
+}
+
 export class Component {
   constructor({ type, lifeTime, children }) {
     this.type = type;
@@ -20,7 +26,7 @@ export class Constructor {
 }
 
 export class Argument { 
-  constructor({ position, children }) {
+  constructor({ position, children, value }) {
     this.position = Number.parseInt(position);
     if (children) {
       this.children = children;

@@ -82,4 +82,28 @@ describe('PuzzleContainer class', function() {
     });
   });
   
+  describe('resolve() function', function() {
+    it('should use StandardContainer class resolve mechanism when passing a configuration through its constructor', function() {
+      // arrange
+      const LabelStub = (message) => message;
+      
+      const underTest = new PuzzleContainer(
+        <Component type={LabelStub} lifeTime="singleton">
+          <Constructor>
+            <Argument>
+              <Constant value="Hello World" />
+            </Argument>
+          </Constructor>
+        </Component>
+      );
+      
+      // act
+      const result = underTest.resolve(LabelStub);
+      const value = result();
+      
+      // assert
+      assert.equal(value, "Hello World!");
+    });
+  })
+  
 });

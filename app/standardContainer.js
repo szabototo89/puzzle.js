@@ -1,4 +1,4 @@
-export default class Container {
+export default class StandardContainer {
 	constructor(resolvers = []) {
 		this.resolvers = resolvers;
 		this.components = [];

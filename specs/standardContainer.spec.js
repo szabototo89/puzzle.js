@@ -4,12 +4,12 @@
 
 import ConstantValueResolver from 'resolvers/constantValueResolver';
 import { Constant, Value } from 'parameterConfigurations';
-import Container from 'container'; 
+import StandardContainer from 'standardContainer'; 
 import { assert } from 'chai';
 import React from 'react/addons';
 import jsdom from 'mocha-jsdom';
 
-describe('Container type', function() {
+describe('StandardContainer type', function() {
 	
 	const constant = function(value) {
 		return new Constant(value);
@@ -23,7 +23,7 @@ describe('Container type', function() {
 	
 	beforeEach(function() {
 		const constantValueResolver = new ConstantValueResolver(); 
-		underTest = new Container([ constantValueResolver ]);
+		underTest = new StandardContainer([ constantValueResolver ]);
 	});
 	
 	describe('register(component: Function | Class, configuration: Object) function', function() {
@@ -136,11 +136,11 @@ describe('Container type', function() {
 			const testFunction = (func, b) => func() + b;
 			
 			underTest.register(id, { 
-					parameters: [ constant(2) ]
-				})
-				.register(testFunction, {
-					parameters: [ resolve(id), constant(1) ]
-				});
+        parameters: [ constant(2) ]
+      })
+      .register(testFunction, {
+        parameters: [ resolve(id), constant(1) ]
+      });
 		
 			// act
 			const resolvedFunction = underTest.resolve(testFunction);
