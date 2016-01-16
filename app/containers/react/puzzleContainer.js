@@ -1,29 +1,17 @@
 import ReactConfigurationResolver from 'containers/react/reactConfigurationResolver';
 import StandardContainer from 'standardContainer';
 import { Component } from 'containers/react/containerDefinitions';
-import { Constant } from 'parameterConfigurations';
-import ConstantValueResolver from 'resolvers/constantValueResolver';
+import { Constant, Value } from 'parameterConfigurations';
+import ValueResolver from 'resolvers/valueResolver';
 
 class PuzzleContainer {
-  constructor(configuration, container = new StandardContainer([ new ConstantValueResolver() ]), configurationResolver = new ReactConfigurationResolver()) {
+  constructor(configuration, container = new StandardContainer([ new ValueResolver() ]), configurationResolver = new ReactConfigurationResolver()) {
     this.configuration = configurationResolver.resolve(configuration);
     this.container = container;
-    
-    this.createObjectGraph(container, this.getConfiguration());
+    this.isObjectGraphReady = false;
   }
   
   createObjectGraph(container, configuration) {
-    // function registerComponentByConstructor(component) {
-    //   
-    // }
-    // 
-    // function createObjectGraphByComponent(child) {
-    //   const { type } = child;
-    //   if (!type) throw new Error('Type must be defined in the current component.', child);
-    //   
-    //   this.container.register(type);
-    // }
-    
     function getArgumentConstantValue(config) {
       if (config.typeOf !== 'Constant') {
         return null;
@@ -60,8 +48,16 @@ class PuzzleContainer {
         position,
         value: argumentValues.reduce((previousValue, { name, value }) => Object.assign({}, previousValue, {
           [name]: value
-        }))
+        }), { })
       };
+    }
+    
+    function instantiateValue(value) {
+      if (value.constructor === Constant) {
+        return value;
+      }
+      
+      return new Value(value);
     }
     
     function getConstructor(config) {
@@ -73,7 +69,7 @@ class PuzzleContainer {
       const args = children.filter(child => child.typeOf === 'Argument')
                            .map(getArgument)
                            .sort(({ position: pos1 }, { position: pos2 }) => pos1 - pos2)
-                           .map(({ value }) => value);
+                           .map(({ value }) => instantiateValue(value));
                            
       return args;                           
     }
@@ -108,6 +104,10 @@ class PuzzleContainer {
   }
   
   resolve(component) {
+    if (!this.isObjectGraphReady) {
+      this.createObjectGraph(this.container, this.getConfiguration());
+    }
+    
     return this.container.resolve(component);
   }
 }

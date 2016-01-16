@@ -19,7 +19,7 @@ export default class StandardContainer {
 	getParameterValue(parameterConfiguration) {
 		for (const resolver of this.resolvers) {
 			if (resolver.canResolve(parameterConfiguration)) {
-				return resolver.resolve(parameterConfiguration, this);
+				return resolver.resolve(parameterConfiguration, this.resolvers);
 			}
 		}
 

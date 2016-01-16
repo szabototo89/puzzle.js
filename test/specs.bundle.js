@@ -8416,6 +8416,18 @@
 
 	var _puzzleContainer2 = _interopRequireDefault(_puzzleContainer);
 
+	var _standardContainer = __webpack_require__(61);
+
+	var _standardContainer2 = _interopRequireDefault(_standardContainer);
+
+	var _constantValueResolver = __webpack_require__(54);
+
+	var _constantValueResolver2 = _interopRequireDefault(_constantValueResolver);
+
+	var _valueResolver = __webpack_require__(243);
+
+	var _valueResolver2 = _interopRequireDefault(_valueResolver);
+
 	var _react = __webpack_require__(63);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -8580,43 +8592,7 @@
 
 	      // assert
 	      _chai.assert.isDefined(result);
-	      console.warn(JSON.stringify(result));
-	      console.warn(JSON.stringify({
-	        typeOf: 'Components',
-	        children: [{
-	          typeOf: 'Component',
-	          name: 'TextBoxStub',
-	          type: TextBoxStub
-	        }, {
-	          typeOf: 'Constant',
-	          name: 'message',
-	          value: 'Hello World!'
-	        }, {
-	          typeOf: 'Component',
-	          name: 'Label',
-	          type: LabelStub,
-	          lifeTime: 'singleton',
-	          children: [{
-	            typeOf: 'Parameter',
-	            children: [{
-	              typeOf: 'Argument',
-	              position: 0,
-	              children: [{
-	                typeOf: 'Reference',
-	                name: 'TextBox',
-	                to: 'TextBoxStub'
-	              }, {
-	                typeOf: 'Component',
-	                name: 'TextBox2',
-	                type: TextBoxStub
-	              }]
-	            }, {
-	              typeOf: 'Argument',
-	              position: 1
-	            }]
-	          }]
-	        }]
-	      }));
+
 	      _chai.assert.deepEqual(result, {
 	        typeOf: 'Components',
 	        children: [{
@@ -8657,13 +8633,18 @@
 	  });
 
 	  describe('resolve() function', function () {
+
+	    var createContainer = function createContainer(configuration) {
+	      return new _puzzleContainer2.default(configuration, new _standardContainer2.default([new _constantValueResolver2.default(), new _valueResolver2.default()]));
+	    };
+
 	    it('should use StandardContainer class resolve mechanism when passing a one-value-based constructor configuration through its constructor', function () {
 	      // arrange
 	      var LabelStub = function LabelStub(message) {
 	        return message;
 	      };
 
-	      var underTest = new _puzzleContainer2.default(_react2.default.createElement(
+	      var underTest = createContainer(_react2.default.createElement(
 	        _containerDefinitions.Components,
 	        null,
 	        _react2.default.createElement(
@@ -8695,7 +8676,7 @@
 	        return message;
 	      };
 
-	      var underTest = new _puzzleContainer2.default(_react2.default.createElement(
+	      var underTest = createContainer(_react2.default.createElement(
 	        _containerDefinitions.Components,
 	        null,
 	        _react2.default.createElement(
@@ -8753,9 +8734,9 @@
 
 	var _parameterConfigurations = __webpack_require__(56);
 
-	var _constantValueResolver = __webpack_require__(54);
+	var _valueResolver = __webpack_require__(243);
 
-	var _constantValueResolver2 = _interopRequireDefault(_constantValueResolver);
+	var _valueResolver2 = _interopRequireDefault(_valueResolver);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8765,31 +8746,19 @@
 
 	var PuzzleContainer = (function () {
 	  function PuzzleContainer(configuration) {
-	    var container = arguments.length <= 1 || arguments[1] === undefined ? new _standardContainer2.default([new _constantValueResolver2.default()]) : arguments[1];
+	    var container = arguments.length <= 1 || arguments[1] === undefined ? new _standardContainer2.default([new _valueResolver2.default()]) : arguments[1];
 	    var configurationResolver = arguments.length <= 2 || arguments[2] === undefined ? new _reactConfigurationResolver2.default() : arguments[2];
 
 	    _classCallCheck(this, PuzzleContainer);
 
 	    this.configuration = configurationResolver.resolve(configuration);
 	    this.container = container;
-
-	    this.createObjectGraph(container, this.getConfiguration());
+	    this.isObjectGraphReady = false;
 	  }
 
 	  _createClass(PuzzleContainer, [{
 	    key: 'createObjectGraph',
 	    value: function createObjectGraph(container, configuration) {
-	      // function registerComponentByConstructor(component) {
-	      //  
-	      // }
-	      //
-	      // function createObjectGraphByComponent(child) {
-	      //   const { type } = child;
-	      //   if (!type) throw new Error('Type must be defined in the current component.', child);
-	      //  
-	      //   this.container.register(type);
-	      // }
-
 	      function getArgumentConstantValue(config) {
 	        if (config.typeOf !== 'Constant') {
 	          return null;
@@ -8833,8 +8802,16 @@
 	            var name = _ref.name;
 	            var value = _ref.value;
 	            return Object.assign({}, previousValue, _defineProperty({}, name, value));
-	          })
+	          }, {})
 	        };
+	      }
+
+	      function instantiateValue(value) {
+	        if (value.constructor === _parameterConfigurations.Constant) {
+	          return value;
+	        }
+
+	        return new _parameterConfigurations.Value(value);
 	      }
 
 	      function getConstructor(config) {
@@ -8852,7 +8829,7 @@
 	          return pos1 - pos2;
 	        }).map(function (_ref4) {
 	          var value = _ref4.value;
-	          return value;
+	          return instantiateValue(value);
 	        });
 
 	        return args;
@@ -8900,6 +8877,10 @@
 	  }, {
 	    key: 'resolve',
 	    value: function resolve(component) {
+	      if (!this.isObjectGraphReady) {
+	        this.createObjectGraph(this.container, this.getConfiguration());
+	      }
+
 	      return this.container.resolve(component);
 	    }
 	  }]);
@@ -9015,7 +8996,7 @@
 						var resolver = _step.value;
 
 						if (resolver.canResolve(parameterConfiguration)) {
-							return resolver.resolve(parameterConfiguration, this);
+							return resolver.resolve(parameterConfiguration, this.resolvers);
 						}
 					}
 				} catch (err) {

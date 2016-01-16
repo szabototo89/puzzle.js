@@ -1,4 +1,7 @@
 import PuzzleContainer from 'containers/react/puzzleContainer';
+import StandardContainer from 'standardContainer';
+import ConstantValueResolver from 'resolvers/constantValueResolver';
+import ValueResolver from 'resolvers/valueResolver';
 import React from 'react';
 import { assert } from 'chai';
 import { Components, Component, Argument, Constructor, Constant, Parameter, Reference } from 'containers/react/containerDefinitions';
@@ -119,53 +122,7 @@ describe('PuzzleContainer class', function() {
 
       // assert
       assert.isDefined(result);
-      console.warn(JSON.stringify(result))
-      console.warn(JSON.stringify({
-        typeOf: 'Components',
-        children: [
-          { 
-            typeOf: 'Component', 
-            name: 'TextBoxStub',
-            type: TextBoxStub
-          },
-          { 
-            typeOf: 'Constant',
-            name: 'message',
-            value: 'Hello World!'
-          },
-          { 
-            typeOf: 'Component',
-            name: 'Label',
-            type: LabelStub,
-            lifeTime: 'singleton',
-            children: [{
-              typeOf: 'Parameter',
-              children: [
-                { 
-                  typeOf: 'Argument',
-                  position: 0,
-                  children: [
-                    { 
-                      typeOf: 'Reference',
-                      name: 'TextBox',
-                      to: 'TextBoxStub' 
-                    },
-                    { 
-                      typeOf: 'Component',
-                      name: 'TextBox2',
-                      type: TextBoxStub 
-                    }
-                  ] 
-                },
-                { 
-                  typeOf: 'Argument',
-                  position: 1 
-                }
-              ]
-            }] 
-          }
-        ]
-      }))
+     
       assert.deepEqual(result, {
         typeOf: 'Components',
         children: [
@@ -216,11 +173,16 @@ describe('PuzzleContainer class', function() {
   });
 
   describe('resolve() function', function() {
+    
+    const createContainer = function(configuration) {
+      return new PuzzleContainer(configuration, new StandardContainer([ new ConstantValueResolver(), new ValueResolver() ]));
+    }
+    
     it('should use StandardContainer class resolve mechanism when passing a one-value-based constructor configuration through its constructor', function() {
       // arrange
       const LabelStub = (message) => message;
 
-      const underTest = new PuzzleContainer(
+      const underTest = createContainer(
         <Components>
           <Component type={LabelStub} lifeTime="singleton">
             <Constructor>
@@ -244,7 +206,7 @@ describe('PuzzleContainer class', function() {
       // arrange
       const LabelStub = (message) => message;
 
-      const underTest = new PuzzleContainer(
+      const underTest = createContainer(
         <Components>
           <Component type={LabelStub} lifeTime="singleton">
             <Constructor>
