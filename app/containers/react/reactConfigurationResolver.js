@@ -10,12 +10,12 @@ class ReactConfigurationResolver {
   }
   
   resolve(definition) {
-    const { type, props } = definition;
+    const { type: Type, props } = definition;
     const args = Object.assign({ }, props, {
       children: this.resolveChildren(props.children)
     });
     
-    return new type(args);  
+    return new Type(args);  
   }
 }
 
