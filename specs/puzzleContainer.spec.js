@@ -4,7 +4,7 @@ import ConstantValueResolver from 'resolvers/constantValueResolver';
 import ValueResolver from 'resolvers/valueResolver';
 import React from 'react';
 import { assert } from 'chai';
-import { Components, Component, Argument, Constructor, Constant, Parameter, Reference } from 'containers/react/containerDefinitions';
+import { Components, Component, Argument, ConstructorFunction, Constant, Parameter, Reference } from 'containers/react/containerDefinitions';
 
 describe('PuzzleContainer class', function() {
 
@@ -17,12 +17,12 @@ describe('PuzzleContainer class', function() {
       // arrange
       const underTest = new PuzzleContainer(
         <Component type={LabelStub} lifeTime="singleton">
-          <Constructor>
+          <ConstructorFunction>
             <Argument position="0">
               <Component type={TextBoxStub} />
               <Component type={HeaderStub} />
             </Argument>
-          </Constructor>
+          </ConstructorFunction>
         </Component>
       );
 
@@ -37,7 +37,7 @@ describe('PuzzleContainer class', function() {
         lifeTime: "singleton",
         children: [
           {
-            typeOf: 'Constructor',
+            typeOf: 'ConstructorFunction',
             children: [
               {
                 typeOf: 'Argument',
@@ -57,11 +57,11 @@ describe('PuzzleContainer class', function() {
       // arrange
       const underTest = new PuzzleContainer(
         <Component type={LabelStub} lifeTime="singleton">
-          <Constructor>
+          <ConstructorFunction>
             <Argument position="0">
               <Constant value="Hello World!" />
             </Argument>
-          </Constructor>
+          </ConstructorFunction>
         </Component>
       );
 
@@ -77,7 +77,7 @@ describe('PuzzleContainer class', function() {
         lifeTime: "singleton",
         children: [
           {
-            typeOf: 'Constructor',
+            typeOf: 'ConstructorFunction',
             children: [
               {
                 typeOf: 'Argument',
@@ -185,11 +185,11 @@ describe('PuzzleContainer class', function() {
       const underTest = createContainer(
         <Components>
           <Component type={LabelStub} lifeTime="singleton">
-            <Constructor>
+            <ConstructorFunction>
               <Argument>
                 <Constant value="Hello World!" />
               </Argument>
-            </Constructor>
+            </ConstructorFunction>
           </Component>
         </Components>
       );
@@ -209,12 +209,12 @@ describe('PuzzleContainer class', function() {
       const underTest = createContainer(
         <Components>
           <Component type={LabelStub} lifeTime="singleton">
-            <Constructor>
+            <ConstructorFunction>
               <Argument>
                 <Constant name="one" value="Hello" />
                 <Constant name="two" value="World" />
               </Argument>
-            </Constructor>
+            </ConstructorFunction>
           </Component>
         </Components>
       );
@@ -229,6 +229,106 @@ describe('PuzzleContainer class', function() {
         two: "World"
       });
     });
+    
+    it('should use StandardContainer class resolve multiple arguments without explicit position when passing an object-value-based configuration through its constructor', function() {
+      // arrange
+      const DummyFunction = (a, b) => [ a, b ];
+
+      const underTest = createContainer(
+        <Components>
+          <Component type={DummyFunction} lifeTime="singleton">
+            <ConstructorFunction>
+              <Argument>
+                <Constant name="one" value="Hello" />
+                <Constant name="two" value="World" />
+              </Argument>
+              <Argument>
+                <Constant value="Hello World!" />
+              </Argument>
+            </ConstructorFunction>
+          </Component>
+        </Components>
+      );
+
+      // act
+      const result = underTest.resolve(DummyFunction);
+      const value = result();
+
+      // assert
+      assert.deepEqual(value, [{
+        one: "Hello",
+        two: "World"
+      }, "Hello World!"]);
+    });
+    
+    it('should use StandardContainer class resolve multiple arguments with specifying explicit positions when passing an object-value-based configuration through its constructor', function() {
+      // arrange
+      const DummyFunction = (a, b) => [ a, b ];
+
+      const underTest = createContainer(
+        <Components>
+          <Component type={DummyFunction} lifeTime="singleton">
+            <ConstructorFunction>
+              <Argument position="2">
+                <Constant name="one" value="Hello" />
+                <Constant name="two" value="World" />
+              </Argument>
+              <Argument position="1">
+                <Constant value="Hello World!" />
+              </Argument>
+            </ConstructorFunction>
+          </Component>
+        </Components>
+      );
+
+      // act
+      const result = underTest.resolve(DummyFunction);
+      const value = result();
+
+      // assert
+      assert.deepEqual(value, ["Hello World!", {
+        one: "Hello",
+        two: "World"
+      }]);
+    });
+    
+    it('should use StandardContainer class resolve another defined component', function() {
+      // arrange
+      const AnotherDummyFunction = (a) => a; 
+      const DummyFunction = (a, b) => [ a(), b ];
+
+      const underTest = createContainer(
+        <Components>
+          <Component type={AnotherDummyFunction} name="dummy">
+            <ConstructorFunction>
+              <Argument>
+                <Constant value="Hello World!" />
+              </Argument>
+            </ConstructorFunction>
+          </Component>
+          <Component type={DummyFunction}>
+            <ConstructorFunction>
+              <Argument>
+                <Reference name="dummy" />
+              </Argument>
+              <Argument>
+                <Constant value={10} />
+              </Argument>
+            </ConstructorFunction>
+          </Component>
+        </Components>
+      );
+
+      // act
+      const result = underTest.resolve(DummyFunction);
+      const value = result();
+
+      // assert
+      assert.deepEqual(value, [
+        "Hello World!", 10
+      ])
+    });
+    
   });
 });
 

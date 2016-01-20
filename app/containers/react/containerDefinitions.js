@@ -14,14 +14,15 @@ class AbstractDefinition {
 
 export class Components extends AbstractDefinition {
   constructor({ children }) {
-    super('Components');
+    super(Components.typeName);
     this.children = children;
   }
 }
 
+
 export class Component extends AbstractDefinition {
   constructor({ type, name, lifeTime, children }) {
-    super('Component');
+    super(Component.typeName);
 
     this.type = type;
     this.lifeTime = lifeTime;
@@ -36,9 +37,9 @@ export class Component extends AbstractDefinition {
   }
 }
 
-export class Constructor extends AbstractDefinition {
+export class ConstructorFunction extends AbstractDefinition {
   constructor({ children }) {
-    super('Constructor');
+    super(ConstructorFunction.typeName);
 
     if (isDefined(children)) {
       this.children = children;
@@ -48,7 +49,7 @@ export class Constructor extends AbstractDefinition {
 
 export class Argument extends AbstractDefinition {
   constructor({ position, children, value }) {
-    super('Argument');
+    super(Argument.typeName);
     this.position = Number.parseInt(position);
     if (isDefined(children)) {
       this.children = children;
@@ -58,7 +59,7 @@ export class Argument extends AbstractDefinition {
 
 export class Constant extends AbstractDefinition {
   constructor({ value, name }) {
-    super('Constant');
+    super(Constant.typeName);
     this.value = value;
     
     if (isDefined(name)) {
@@ -69,7 +70,7 @@ export class Constant extends AbstractDefinition {
 
 export class Reference extends AbstractDefinition {
   constructor({ name, to }) {
-    super('Reference');
+    super(Reference.typeName);
     this.to = to;
 
     if (isDefined(name)) {
@@ -80,8 +81,16 @@ export class Reference extends AbstractDefinition {
 
 export class Parameter extends AbstractDefinition {
   constructor({ children }) {
-    super('Parameter');
+    super(Parameter.typeName);
     
     this.children = children;
   }
 }
+
+Components.typeName = 'Components';
+Component.typeName = 'Component';
+ConstructorFunction.typeName = 'ConstructorFunction';
+Argument.typeName = 'Argument';
+Constant.typeName = 'Constant';
+Reference.typeName = 'Reference';
+Parameter.typeName = 'Parameter';

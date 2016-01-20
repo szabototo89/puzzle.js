@@ -24,6 +24,20 @@ class PuzzleContainer {
       };
     }
     
+    function getArgumentReferenceValue(config) {
+      if (config.typeOf !== 'Reference') {
+        throw new Error('it requires reference');
+      }
+      
+      const { name } = config;
+      return {
+        name,
+        value: { 
+          resolveComponent: null
+        }
+      }
+    }
+
     function getArgument(argument, index) {
       if (argument.typeOf !== 'Argument') {
         throw new Error(`Unsupported argument: ${argument.typeOf}`);
@@ -31,7 +45,10 @@ class PuzzleContainer {
       
       const { children } = argument;
       const position = argument.position || index;
-      const argumentValues = children.map(child => getArgumentConstantValue(child));
+      const argumentValues = children.map(child => 
+        getArgumentConstantValue(child) || 
+        getArgumentReferenceValue(child)
+      );
       
       if (argumentValues.length === 0) {
         throw new Error('Argument doesn\'t have any value.');  
@@ -61,7 +78,7 @@ class PuzzleContainer {
     }
     
     function getConstructor(config) {
-      if (config.typeOf !== 'Constructor') {
+      if (config.typeOf !== 'ConstructorFunction') {
         throw new Error(`Unsupported constructor: ${config.typeOf}`);
       }
       
@@ -80,7 +97,7 @@ class PuzzleContainer {
       }
       
       const { name, type, children } = config;
-      const [ constructorArgs ] = children.filter(child => child.typeOf === 'Constructor') 
+      const [ constructorArgs ] = children.filter(child => child.typeOf === 'ConstructorFunction') 
                                       .map(getConstructor);
                                    
       container.register(type, {

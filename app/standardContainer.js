@@ -10,7 +10,7 @@ export default class StandardContainer {
 		});
 
 		return this;
-	}
+  }
 
 	registeredComponents() {
 		return [ ...this.components ];

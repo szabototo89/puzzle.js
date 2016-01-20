@@ -47,8 +47,8 @@
 	__webpack_require__(1);
 	__webpack_require__(52);
 	__webpack_require__(57);
-	__webpack_require__(219);
-	module.exports = __webpack_require__(241);
+	__webpack_require__(220);
+	module.exports = __webpack_require__(242);
 
 
 /***/ },
@@ -8424,7 +8424,7 @@
 
 	var _constantValueResolver2 = _interopRequireDefault(_constantValueResolver);
 
-	var _valueResolver = __webpack_require__(243);
+	var _valueResolver = __webpack_require__(219);
 
 	var _valueResolver2 = _interopRequireDefault(_valueResolver);
 
@@ -8488,7 +8488,7 @@
 	        _containerDefinitions.Component,
 	        { type: LabelStub, lifeTime: 'singleton' },
 	        _react2.default.createElement(
-	          _containerDefinitions.Constructor,
+	          _containerDefinitions.ConstructorFunction,
 	          null,
 	          _react2.default.createElement(
 	            _containerDefinitions.Argument,
@@ -8509,7 +8509,7 @@
 	        type: LabelStub,
 	        lifeTime: "singleton",
 	        children: [{
-	          typeOf: 'Constructor',
+	          typeOf: 'ConstructorFunction',
 	          children: [{
 	            typeOf: 'Argument',
 	            position: 0,
@@ -8525,7 +8525,7 @@
 	        _containerDefinitions.Component,
 	        { type: LabelStub, lifeTime: 'singleton' },
 	        _react2.default.createElement(
-	          _containerDefinitions.Constructor,
+	          _containerDefinitions.ConstructorFunction,
 	          null,
 	          _react2.default.createElement(
 	            _containerDefinitions.Argument,
@@ -8546,7 +8546,7 @@
 	        type: LabelStub,
 	        lifeTime: "singleton",
 	        children: [{
-	          typeOf: 'Constructor',
+	          typeOf: 'ConstructorFunction',
 	          children: [{
 	            typeOf: 'Argument',
 	            position: 0,
@@ -8651,7 +8651,7 @@
 	          _containerDefinitions.Component,
 	          { type: LabelStub, lifeTime: 'singleton' },
 	          _react2.default.createElement(
-	            _containerDefinitions.Constructor,
+	            _containerDefinitions.ConstructorFunction,
 	            null,
 	            _react2.default.createElement(
 	              _containerDefinitions.Argument,
@@ -8683,7 +8683,7 @@
 	          _containerDefinitions.Component,
 	          { type: LabelStub, lifeTime: 'singleton' },
 	          _react2.default.createElement(
-	            _containerDefinitions.Constructor,
+	            _containerDefinitions.ConstructorFunction,
 	            null,
 	            _react2.default.createElement(
 	              _containerDefinitions.Argument,
@@ -8704,6 +8704,141 @@
 	        one: "Hello",
 	        two: "World"
 	      });
+	    });
+
+	    it('should use StandardContainer class resolve multiple arguments without explicit position when passing an object-value-based configuration through its constructor', function () {
+	      // arrange
+	      var DummyFunction = function DummyFunction(a, b) {
+	        return [a, b];
+	      };
+
+	      var underTest = createContainer(_react2.default.createElement(
+	        _containerDefinitions.Components,
+	        null,
+	        _react2.default.createElement(
+	          _containerDefinitions.Component,
+	          { type: DummyFunction, lifeTime: 'singleton' },
+	          _react2.default.createElement(
+	            _containerDefinitions.ConstructorFunction,
+	            null,
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              null,
+	              _react2.default.createElement(_containerDefinitions.Constant, { name: 'one', value: 'Hello' }),
+	              _react2.default.createElement(_containerDefinitions.Constant, { name: 'two', value: 'World' })
+	            ),
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              null,
+	              _react2.default.createElement(_containerDefinitions.Constant, { value: 'Hello World!' })
+	            )
+	          )
+	        )
+	      ));
+
+	      // act
+	      var result = underTest.resolve(DummyFunction);
+	      var value = result();
+
+	      // assert
+	      _chai.assert.deepEqual(value, [{
+	        one: "Hello",
+	        two: "World"
+	      }, "Hello World!"]);
+	    });
+
+	    it('should use StandardContainer class resolve multiple arguments with specifying explicit positions when passing an object-value-based configuration through its constructor', function () {
+	      // arrange
+	      var DummyFunction = function DummyFunction(a, b) {
+	        return [a, b];
+	      };
+
+	      var underTest = createContainer(_react2.default.createElement(
+	        _containerDefinitions.Components,
+	        null,
+	        _react2.default.createElement(
+	          _containerDefinitions.Component,
+	          { type: DummyFunction, lifeTime: 'singleton' },
+	          _react2.default.createElement(
+	            _containerDefinitions.ConstructorFunction,
+	            null,
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              { position: '2' },
+	              _react2.default.createElement(_containerDefinitions.Constant, { name: 'one', value: 'Hello' }),
+	              _react2.default.createElement(_containerDefinitions.Constant, { name: 'two', value: 'World' })
+	            ),
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              { position: '1' },
+	              _react2.default.createElement(_containerDefinitions.Constant, { value: 'Hello World!' })
+	            )
+	          )
+	        )
+	      ));
+
+	      // act
+	      var result = underTest.resolve(DummyFunction);
+	      var value = result();
+
+	      // assert
+	      _chai.assert.deepEqual(value, ["Hello World!", {
+	        one: "Hello",
+	        two: "World"
+	      }]);
+	    });
+
+	    it('should use StandardContainer class resolve another defined component', function () {
+	      // arrange
+	      var AnotherDummyFunction = function AnotherDummyFunction(a) {
+	        return a;
+	      };
+	      var DummyFunction = function DummyFunction(a, b) {
+	        return [a(), b];
+	      };
+
+	      var underTest = createContainer(_react2.default.createElement(
+	        _containerDefinitions.Components,
+	        null,
+	        _react2.default.createElement(
+	          _containerDefinitions.Component,
+	          { type: AnotherDummyFunction, name: 'dummy' },
+	          _react2.default.createElement(
+	            _containerDefinitions.ConstructorFunction,
+	            null,
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              null,
+	              _react2.default.createElement(_containerDefinitions.Constant, { value: 'Hello World!' })
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          _containerDefinitions.Component,
+	          { type: DummyFunction },
+	          _react2.default.createElement(
+	            _containerDefinitions.ConstructorFunction,
+	            null,
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              null,
+	              _react2.default.createElement(_containerDefinitions.Reference, { name: 'dummy' })
+	            ),
+	            _react2.default.createElement(
+	              _containerDefinitions.Argument,
+	              null,
+	              _react2.default.createElement(_containerDefinitions.Constant, { value: 10 })
+	            )
+	          )
+	        )
+	      ));
+
+	      // act
+	      var result = underTest.resolve(DummyFunction);
+	      var value = result();
+
+	      // assert
+	      _chai.assert.deepEqual(value, ["Hello World!", 10]);
 	    });
 	  });
 	});
@@ -8734,7 +8869,7 @@
 
 	var _parameterConfigurations = __webpack_require__(56);
 
-	var _valueResolver = __webpack_require__(243);
+	var _valueResolver = __webpack_require__(219);
 
 	var _valueResolver2 = _interopRequireDefault(_valueResolver);
 
@@ -8773,6 +8908,21 @@
 	        };
 	      }
 
+	      function getArgumentReferenceValue(config) {
+	        if (config.typeOf !== 'Reference') {
+	          throw new Error('it requires reference');
+	        }
+
+	        var name = config.name;
+
+	        return {
+	          name: name,
+	          value: {
+	            resolveComponent: null
+	          }
+	        };
+	      }
+
 	      function getArgument(argument, index) {
 	        if (argument.typeOf !== 'Argument') {
 	          throw new Error('Unsupported argument: ' + argument.typeOf);
@@ -8782,7 +8932,7 @@
 
 	        var position = argument.position || index;
 	        var argumentValues = children.map(function (child) {
-	          return getArgumentConstantValue(child);
+	          return getArgumentConstantValue(child) || getArgumentReferenceValue(child);
 	        });
 
 	        if (argumentValues.length === 0) {
@@ -8815,7 +8965,7 @@
 	      }
 
 	      function getConstructor(config) {
-	        if (config.typeOf !== 'Constructor') {
+	        if (config.typeOf !== 'ConstructorFunction') {
 	          throw new Error('Unsupported constructor: ' + config.typeOf);
 	        }
 
@@ -8845,7 +8995,7 @@
 	        var children = config.children;
 
 	        var _children$filter$map = children.filter(function (child) {
-	          return child.typeOf === 'Constructor';
+	          return child.typeOf === 'ConstructorFunction';
 	        }).map(getConstructor);
 
 	        var _children$filter$map2 = _slicedToArray(_children$filter$map, 1);
@@ -9071,7 +9221,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.Parameter = exports.Reference = exports.Constant = exports.Argument = exports.Constructor = exports.Component = exports.Components = undefined;
+	exports.Parameter = exports.Reference = exports.Constant = exports.Argument = exports.ConstructorFunction = exports.Component = exports.Components = undefined;
 
 	var _react = __webpack_require__(63);
 
@@ -9105,7 +9255,7 @@
 
 	    _classCallCheck(this, Components);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Components).call(this, 'Components'));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Components).call(this, Components.typeName));
 
 	    _this.children = children;
 	    return _this;
@@ -9125,7 +9275,7 @@
 
 	    _classCallCheck(this, Component);
 
-	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Component).call(this, 'Component'));
+	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Component).call(this, Component.typeName));
 
 	    _this2.type = type;
 	    _this2.lifeTime = lifeTime;
@@ -9143,15 +9293,15 @@
 	  return Component;
 	})(AbstractDefinition);
 
-	var Constructor = exports.Constructor = (function (_AbstractDefinition3) {
-	  _inherits(Constructor, _AbstractDefinition3);
+	var ConstructorFunction = exports.ConstructorFunction = (function (_AbstractDefinition3) {
+	  _inherits(ConstructorFunction, _AbstractDefinition3);
 
-	  function Constructor(_ref3) {
+	  function ConstructorFunction(_ref3) {
 	    var children = _ref3.children;
 
-	    _classCallCheck(this, Constructor);
+	    _classCallCheck(this, ConstructorFunction);
 
-	    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Constructor).call(this, 'Constructor'));
+	    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(ConstructorFunction).call(this, ConstructorFunction.typeName));
 
 	    if (isDefined(children)) {
 	      _this3.children = children;
@@ -9159,7 +9309,7 @@
 	    return _this3;
 	  }
 
-	  return Constructor;
+	  return ConstructorFunction;
 	})(AbstractDefinition);
 
 	var Argument = exports.Argument = (function (_AbstractDefinition4) {
@@ -9172,7 +9322,7 @@
 
 	    _classCallCheck(this, Argument);
 
-	    var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Argument).call(this, 'Argument'));
+	    var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Argument).call(this, Argument.typeName));
 
 	    _this4.position = Number.parseInt(position);
 	    if (isDefined(children)) {
@@ -9193,7 +9343,7 @@
 
 	    _classCallCheck(this, Constant);
 
-	    var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Constant).call(this, 'Constant'));
+	    var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(Constant).call(this, Constant.typeName));
 
 	    _this5.value = value;
 
@@ -9215,7 +9365,7 @@
 
 	    _classCallCheck(this, Reference);
 
-	    var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(Reference).call(this, 'Reference'));
+	    var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(Reference).call(this, Reference.typeName));
 
 	    _this6.to = to;
 
@@ -9236,7 +9386,7 @@
 
 	    _classCallCheck(this, Parameter);
 
-	    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Parameter).call(this, 'Parameter'));
+	    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Parameter).call(this, Parameter.typeName));
 
 	    _this7.children = children;
 	    return _this7;
@@ -9244,6 +9394,14 @@
 
 	  return Parameter;
 	})(AbstractDefinition);
+
+	Components.typeName = 'Components';
+	Component.typeName = 'Component';
+	ConstructorFunction.typeName = 'ConstructorFunction';
+	Argument.typeName = 'Argument';
+	Constant.typeName = 'Constant';
+	Reference.typeName = 'Reference';
+	Parameter.typeName = 'Parameter';
 
 /***/ },
 /* 63 */
@@ -28730,11 +28888,157 @@
 /* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _abstractResolver = __webpack_require__(55);
+
+	var _abstractResolver2 = _interopRequireDefault(_abstractResolver);
+
+	var _parameterConfigurations = __webpack_require__(56);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var ValueResolver = (function (_AbstractResolver) {
+	  _inherits(ValueResolver, _AbstractResolver);
+
+	  function ValueResolver() {
+	    _classCallCheck(this, ValueResolver);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ValueResolver).apply(this, arguments));
+	  }
+
+	  _createClass(ValueResolver, [{
+	    key: 'canResolve',
+	    value: function canResolve(parameterConfiguration) {
+	      return parameterConfiguration && Object.getOwnPropertyNames(parameterConfiguration).some(function (propertyName) {
+	        return propertyName === 'value';
+	      });
+	    }
+	  }, {
+	    key: 'resolveBySpecifiedResolvers',
+	    value: function resolveBySpecifiedResolvers(parameter, resolvers) {
+	      if (resolvers.some(function (resolver) {
+	        return !(resolver instanceof _abstractResolver2.default);
+	      })) {
+	        throw new Error('Resolver must be extended from AbstractResolver');
+	      }
+
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = resolvers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var resolver = _step.value;
+
+	          if (resolver.canResolve(parameter)) {
+	            return resolver.resolve(parameter, resolvers);
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      return parameter;
+	    }
+	  }, {
+	    key: 'resolveArray',
+	    value: function resolveArray(parameter, resolvers) {
+	      return parameter;
+	    }
+	  }, {
+	    key: 'resolveObject',
+	    value: function resolveObject(parameter, resolvers) {
+	      var result = {};
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
+
+	      try {
+	        for (var _iterator2 = Object.keys(parameter)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var key = _step2.value;
+
+	          var value = this.resolveBySpecifiedResolvers(parameter[key], resolvers);
+	          result = Object.assign({}, result, _defineProperty({}, key, value));
+	        }
+	      } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
+	          }
+	        } finally {
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
+	          }
+	        }
+	      }
+
+	      return result;
+	    }
+	  }, {
+	    key: 'resolve',
+	    value: function resolve(parameterConfiguration) {
+	      var resolvers = arguments.length <= 1 || arguments[1] === undefined ? [this] : arguments[1];
+	      var parameter = parameterConfiguration.value;
+
+	      if (Array.isArray(parameter)) {
+	        return this.resolveArray(parameter, resolvers);
+	      }
+
+	      if (parameter.constructor === _parameterConfigurations.Value) {
+	        return this.resolve(parameter, resolvers);
+	      }
+
+	      if (parameter instanceof Object) {
+	        return this.resolveObject(parameter, resolvers);
+	      }
+
+	      return this.resolveBySpecifiedResolvers(parameter, resolvers);
+	    }
+	  }]);
+
+	  return ValueResolver;
+	})(_abstractResolver2.default);
+
+	exports.default = ValueResolver;
+
+/***/ },
+/* 220 */
+/***/ function(module, exports, __webpack_require__) {
+
 	"use strict";
 
 	__webpack_require__(2);
 	mocha.setup("bdd");
-	__webpack_require__(220);
+	__webpack_require__(221);
 	__webpack_require__(50);
 	if (false) {
 		module.hot.accept();
@@ -28748,7 +29052,7 @@
 	}
 
 /***/ },
-/* 220 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28769,11 +29073,11 @@
 
 	var _chai = __webpack_require__(12);
 
-	var _addons = __webpack_require__(221);
+	var _addons = __webpack_require__(222);
 
 	var _addons2 = _interopRequireDefault(_addons);
 
-	var _mochaJsdom = __webpack_require__(240);
+	var _mochaJsdom = __webpack_require__(241);
 
 	var _mochaJsdom2 = _interopRequireDefault(_mochaJsdom);
 
@@ -28998,7 +29302,7 @@
 	});
 
 /***/ },
-/* 221 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29013,11 +29317,11 @@
 	  'Access using require' + "('react-addons-{addon}') instead."
 	);
 
-	module.exports = __webpack_require__(222);
+	module.exports = __webpack_require__(223);
 
 
 /***/ },
-/* 222 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -29040,17 +29344,17 @@
 
 	'use strict';
 
-	var LinkedStateMixin = __webpack_require__(223);
+	var LinkedStateMixin = __webpack_require__(224);
 	var React = __webpack_require__(64);
-	var ReactComponentWithPureRenderMixin = __webpack_require__(226);
-	var ReactCSSTransitionGroup = __webpack_require__(228);
-	var ReactFragment = __webpack_require__(234);
-	var ReactTransitionGroup = __webpack_require__(229);
+	var ReactComponentWithPureRenderMixin = __webpack_require__(227);
+	var ReactCSSTransitionGroup = __webpack_require__(229);
+	var ReactFragment = __webpack_require__(235);
+	var ReactTransitionGroup = __webpack_require__(230);
 	var ReactUpdates = __webpack_require__(115);
 
-	var cloneWithProps = __webpack_require__(235);
-	var shallowCompare = __webpack_require__(227);
-	var update = __webpack_require__(238);
+	var cloneWithProps = __webpack_require__(236);
+	var shallowCompare = __webpack_require__(228);
+	var update = __webpack_require__(239);
 	var warning = __webpack_require__(86);
 
 	var warnedAboutBatchedUpdates = false;
@@ -29076,14 +29380,14 @@
 
 	if (process.env.NODE_ENV !== 'production') {
 	  React.addons.Perf = __webpack_require__(203);
-	  React.addons.TestUtils = __webpack_require__(239);
+	  React.addons.TestUtils = __webpack_require__(240);
 	}
 
 	module.exports = React;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 223 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29100,8 +29404,8 @@
 
 	'use strict';
 
-	var ReactLink = __webpack_require__(224);
-	var ReactStateSetters = __webpack_require__(225);
+	var ReactLink = __webpack_require__(225);
+	var ReactStateSetters = __webpack_require__(226);
 
 	/**
 	 * A simple mixin around ReactLink.forState().
@@ -29124,7 +29428,7 @@
 	module.exports = LinkedStateMixin;
 
 /***/ },
-/* 224 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29198,7 +29502,7 @@
 	module.exports = ReactLink;
 
 /***/ },
-/* 225 */
+/* 226 */
 /***/ function(module, exports) {
 
 	/**
@@ -29307,7 +29611,7 @@
 	module.exports = ReactStateSetters;
 
 /***/ },
-/* 226 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29323,7 +29627,7 @@
 
 	'use strict';
 
-	var shallowCompare = __webpack_require__(227);
+	var shallowCompare = __webpack_require__(228);
 
 	/**
 	 * If your React component's render function is "pure", e.g. it will render the
@@ -29358,7 +29662,7 @@
 	module.exports = ReactComponentWithPureRenderMixin;
 
 /***/ },
-/* 227 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29387,7 +29691,7 @@
 	module.exports = shallowCompare;
 
 /***/ },
-/* 228 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29408,8 +29712,8 @@
 
 	var assign = __webpack_require__(100);
 
-	var ReactTransitionGroup = __webpack_require__(229);
-	var ReactCSSTransitionGroupChild = __webpack_require__(231);
+	var ReactTransitionGroup = __webpack_require__(230);
+	var ReactCSSTransitionGroupChild = __webpack_require__(232);
 
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -29475,7 +29779,7 @@
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 229 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29492,7 +29796,7 @@
 	'use strict';
 
 	var React = __webpack_require__(64);
-	var ReactTransitionChildMapping = __webpack_require__(230);
+	var ReactTransitionChildMapping = __webpack_require__(231);
 
 	var assign = __webpack_require__(100);
 	var emptyFunction = __webpack_require__(76);
@@ -29685,7 +29989,7 @@
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 230 */
+/* 231 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29788,7 +30092,7 @@
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 231 */
+/* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29808,8 +30112,8 @@
 	var React = __webpack_require__(64);
 	var ReactDOM = __webpack_require__(65);
 
-	var CSSCore = __webpack_require__(232);
-	var ReactTransitionEvents = __webpack_require__(233);
+	var CSSCore = __webpack_require__(233);
+	var ReactTransitionEvents = __webpack_require__(234);
 
 	var onlyChild = __webpack_require__(217);
 
@@ -29958,7 +30262,7 @@
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 232 */
+/* 233 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -30061,7 +30365,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 233 */
+/* 234 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30175,7 +30479,7 @@
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 234 */
+/* 235 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -30245,7 +30549,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 235 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -30263,7 +30567,7 @@
 	'use strict';
 
 	var ReactElement = __webpack_require__(103);
-	var ReactPropTransferer = __webpack_require__(236);
+	var ReactPropTransferer = __webpack_require__(237);
 
 	var keyOf = __webpack_require__(140);
 	var warning = __webpack_require__(86);
@@ -30305,7 +30609,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 236 */
+/* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30323,7 +30627,7 @@
 
 	var assign = __webpack_require__(100);
 	var emptyFunction = __webpack_require__(76);
-	var joinClasses = __webpack_require__(237);
+	var joinClasses = __webpack_require__(238);
 
 	/**
 	 * Creates a transfer strategy that will merge prop values using the supplied
@@ -30418,7 +30722,7 @@
 	module.exports = ReactPropTransferer;
 
 /***/ },
-/* 237 */
+/* 238 */
 /***/ function(module, exports) {
 
 	/**
@@ -30462,7 +30766,7 @@
 	module.exports = joinClasses;
 
 /***/ },
-/* 238 */
+/* 239 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -30575,7 +30879,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 239 */
+/* 240 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -31054,7 +31358,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 240 */
+/* 241 */
 /***/ function(module, exports) {
 
 	/*
@@ -31066,14 +31370,14 @@
 
 
 /***/ },
-/* 241 */
+/* 242 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	__webpack_require__(2);
 	mocha.setup("bdd");
-	__webpack_require__(242);
+	__webpack_require__(243);
 	__webpack_require__(50);
 	if (false) {
 		module.hot.accept();
@@ -31087,12 +31391,12 @@
 	}
 
 /***/ },
-/* 242 */
+/* 243 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _valueResolver = __webpack_require__(243);
+	var _valueResolver = __webpack_require__(219);
 
 	var _valueResolver2 = _interopRequireDefault(_valueResolver);
 
@@ -31180,152 +31484,6 @@
 			});
 		});
 	}); /* global describe */
-
-/***/ },
-/* 243 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _abstractResolver = __webpack_require__(55);
-
-	var _abstractResolver2 = _interopRequireDefault(_abstractResolver);
-
-	var _parameterConfigurations = __webpack_require__(56);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var ValueResolver = (function (_AbstractResolver) {
-	  _inherits(ValueResolver, _AbstractResolver);
-
-	  function ValueResolver() {
-	    _classCallCheck(this, ValueResolver);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ValueResolver).apply(this, arguments));
-	  }
-
-	  _createClass(ValueResolver, [{
-	    key: 'canResolve',
-	    value: function canResolve(parameterConfiguration) {
-	      return parameterConfiguration && Object.getOwnPropertyNames(parameterConfiguration).some(function (propertyName) {
-	        return propertyName === 'value';
-	      });
-	    }
-	  }, {
-	    key: 'resolveBySpecifiedResolvers',
-	    value: function resolveBySpecifiedResolvers(parameter, resolvers) {
-	      if (resolvers.some(function (resolver) {
-	        return !(resolver instanceof _abstractResolver2.default);
-	      })) {
-	        throw new Error('Resolver must be extended from AbstractResolver');
-	      }
-
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = resolvers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var resolver = _step.value;
-
-	          if (resolver.canResolve(parameter)) {
-	            return resolver.resolve(parameter, resolvers);
-	          }
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-
-	      return parameter;
-	    }
-	  }, {
-	    key: 'resolveArray',
-	    value: function resolveArray(parameter, resolvers) {
-	      return parameter;
-	    }
-	  }, {
-	    key: 'resolveObject',
-	    value: function resolveObject(parameter, resolvers) {
-	      var result = {};
-	      var _iteratorNormalCompletion2 = true;
-	      var _didIteratorError2 = false;
-	      var _iteratorError2 = undefined;
-
-	      try {
-	        for (var _iterator2 = Object.keys(parameter)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	          var key = _step2.value;
-
-	          var value = this.resolveBySpecifiedResolvers(parameter[key], resolvers);
-	          result = Object.assign({}, result, _defineProperty({}, key, value));
-	        }
-	      } catch (err) {
-	        _didIteratorError2 = true;
-	        _iteratorError2 = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	            _iterator2.return();
-	          }
-	        } finally {
-	          if (_didIteratorError2) {
-	            throw _iteratorError2;
-	          }
-	        }
-	      }
-
-	      return result;
-	    }
-	  }, {
-	    key: 'resolve',
-	    value: function resolve(parameterConfiguration) {
-	      var resolvers = arguments.length <= 1 || arguments[1] === undefined ? [this] : arguments[1];
-	      var parameter = parameterConfiguration.value;
-
-	      if (Array.isArray(parameter)) {
-	        return this.resolveArray(parameter, resolvers);
-	      }
-
-	      if (parameter.constructor === _parameterConfigurations.Value) {
-	        return this.resolve(parameter, resolvers);
-	      }
-
-	      if (parameter instanceof Object) {
-	        return this.resolveObject(parameter, resolvers);
-	      }
-
-	      return this.resolveBySpecifiedResolvers(parameter, resolvers);
-	    }
-	  }]);
-
-	  return ValueResolver;
-	})(_abstractResolver2.default);
-
-	exports.default = ValueResolver;
 
 /***/ }
 /******/ ]);
