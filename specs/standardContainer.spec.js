@@ -256,7 +256,7 @@ describe('StandardContainer type', function() {
       
       const underTest = builder.withComponent(id).withParameters(constant(2))
                                .withComponent(sum).withParameters(constant(1), constant(2))
-                               .withComponent(sumFunction).withParameters(resolve(sum), 3)
+                               .withComponent(sumFunction).withParameters(resolve(sum), constant(3))
                                .build();
 		
 			// act

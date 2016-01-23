@@ -19,7 +19,7 @@ export default class ValueResolver extends AbstractResolver {
       }
     }
 
-    return parameter;
+    return null;
   }
 
   resolveArray(parameter, resolvers) {
@@ -31,7 +31,7 @@ export default class ValueResolver extends AbstractResolver {
     for (const key of Object.keys(parameter)) {
       const value = this.resolveBySpecifiedResolvers(parameter[key], resolvers);
       result = Object.assign({ }, result, {
-        [key]: value
+        [key]: value || parameter[key]
       });
     }
 		return result;
@@ -39,6 +39,8 @@ export default class ValueResolver extends AbstractResolver {
 
 	resolve(parameterConfiguration, resolvers = [ this ]) {
 		const { value: parameter } = parameterConfiguration;
+    const value = this.resolveBySpecifiedResolvers(parameter, resolvers);
+    if (value) return value;
 
     if (Array.isArray(parameter)) {
       return this.resolveArray(parameter, resolvers);
@@ -51,7 +53,7 @@ export default class ValueResolver extends AbstractResolver {
     if (parameter instanceof Object) {
       return this.resolveObject(parameter, resolvers);
     }
-
-    return this.resolveBySpecifiedResolvers(parameter, resolvers);
+    
+    return parameter;
 	}
 }

@@ -29056,7 +29056,7 @@
 	        }
 	      }
 
-	      return parameter;
+	      return null;
 	    }
 	  }, {
 	    key: 'resolveArray',
@@ -29076,7 +29076,7 @@
 	          var key = _step2.value;
 
 	          var value = this.resolveBySpecifiedResolvers(parameter[key], resolvers);
-	          result = Object.assign({}, result, _defineProperty({}, key, value));
+	          result = Object.assign({}, result, _defineProperty({}, key, value || parameter[key]));
 	        }
 	      } catch (err) {
 	        _didIteratorError2 = true;
@@ -29101,6 +29101,9 @@
 	      var resolvers = arguments.length <= 1 || arguments[1] === undefined ? [this] : arguments[1];
 	      var parameter = parameterConfiguration.value;
 
+	      var value = this.resolveBySpecifiedResolvers(parameter, resolvers);
+	      if (value) return value;
+
 	      if (Array.isArray(parameter)) {
 	        return this.resolveArray(parameter, resolvers);
 	      }
@@ -29113,7 +29116,7 @@
 	        return this.resolveObject(parameter, resolvers);
 	      }
 
-	      return this.resolveBySpecifiedResolvers(parameter, resolvers);
+	      return parameter;
 	    }
 	  }]);
 
@@ -29480,7 +29483,7 @@
 					return func() + b;
 				};
 
-				var underTest = builder.withComponent(id).withParameters(constant(2)).withComponent(sum).withParameters(constant(1), constant(2)).withComponent(sumFunction).withParameters(resolve(sum), 3).build();
+				var underTest = builder.withComponent(id).withParameters(constant(2)).withComponent(sum).withParameters(constant(1), constant(2)).withComponent(sumFunction).withParameters(resolve(sum), constant(3)).build();
 
 				// act
 				var resolvedComponents = underTest.resolveAll();
