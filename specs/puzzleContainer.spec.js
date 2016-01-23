@@ -122,8 +122,7 @@ describe('PuzzleContainer class', function() {
 
       // assert
       assert.isDefined(result);
-     
-      assert.deepEqual(result, {
+      const expected = {
         typeOf: 'Components',
         children: [
           { 
@@ -168,7 +167,8 @@ describe('PuzzleContainer class', function() {
             }] 
           }
         ]
-      });
+      };
+      assert.deepEqual(result, expected);
     });
   });
 

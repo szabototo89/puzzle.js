@@ -33,7 +33,7 @@ class PuzzleContainer {
       return {
         name,
         value: { 
-          resolveComponent: null
+          resolveComponent: name
         }
       }
     }
@@ -99,9 +99,15 @@ class PuzzleContainer {
       const { name, type, children } = config;
       const [ constructorArgs ] = children.filter(child => child.typeOf === 'ConstructorFunction') 
                                       .map(getConstructor);
-                                   
-      container.register(type, {
-        parameters: constructorArgs
+      
+            
+                                            
+      container.register({
+        name,
+        component: type,
+        configuration: {
+          parameters: constructorArgs
+        }
       });
     }
     
@@ -125,7 +131,7 @@ class PuzzleContainer {
       this.createObjectGraph(this.container, this.getConfiguration());
     }
     
-    return this.container.resolve(component);
+    return this.container.resolve({ component });
   }
 }
 

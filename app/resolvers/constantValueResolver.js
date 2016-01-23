@@ -6,7 +6,7 @@ export default class ConstantValueResolver extends AbstractResolver {
 		return parameterConfiguration && parameterConfiguration instanceof Constant;
 	}
 
-	resolve(parameterConfiguration, resolver) {
+	resolve(parameterConfiguration, resolvers) {
 		return parameterConfiguration.value;
 	}
 }

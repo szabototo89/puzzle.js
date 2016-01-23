@@ -10,7 +10,61 @@ import React from 'react/addons';
 import jsdom from 'mocha-jsdom';
 
 describe('StandardContainer type', function() {
-	
+
+  class StandardContainerBuilder {
+    
+    constructor() {
+      this.components = [];
+    }
+    
+    getLastComponent() {
+      return this.components[this.components.length - 1];
+    }
+    
+    withValueResolvers(...valueResolvers) {
+      const lastComponent = this.getLastComponent();
+      lastComponent.valueResolvers = valueResolvers;
+      return this;
+    }
+    
+    withComponent(component) {
+      this.components.push({
+        component: component
+      });
+      
+      return this;
+    }
+    
+    withComponentName(componentName) {
+      const lastComponent = this.getLastComponent();
+      lastComponent.componentName = componentName;
+      return this;
+    }
+    
+    withParameters(...parameters) {
+      const lastComponent = this.getLastComponent();
+      lastComponent.parameters = parameters;
+      return this;
+    }
+      
+    build() {
+      const defaultValueResolver = new ConstantValueResolver();
+      const container = new StandardContainer(this.valueResolvers || [ defaultValueResolver ]);
+      
+      for (const component of this.components) {
+        container.register({
+          name: component.componentName,
+          component: component.component,
+          configuration: {
+            parameters: component.parameters
+          }
+        }); 
+      }
+      
+      return container;
+    }
+  }
+  
 	const constant = function(value) {
 		return new Constant(value);
 	};
@@ -20,36 +74,46 @@ describe('StandardContainer type', function() {
 	};
 	
 	let underTest;
+  let builder;
 	
 	beforeEach(function() {
 		const constantValueResolver = new ConstantValueResolver(); 
 		underTest = new StandardContainer([ constantValueResolver ]);
+    builder = new StandardContainerBuilder();
 	});
 	
 	describe('register(component: Function | Class, configuration: Object) function', function() {
 		it('should register a function without configuration when passing a function', function() {
 			// arrange
 			const testFunction = (parameter) => parameter; 
+      const underTest = builder.withComponent(testFunction)
+                               .build();
 		
 			// act
-			underTest.register(testFunction);
 			const components = underTest.registeredComponents();
 		
 			// assert
+      
+      console.info(components);
+      
 			assert.include(components, {
+        name: undefined,
 				component: testFunction,
-				configuration: { }
+				configuration: { 
+          parameters: undefined
+        }
 			});
 		});
 		
 		it('should register multiple functions when chaining it', function() {
 			// arrange
 			const testFunction = (parameter) => parameter;
-			const testFunction2 = (parameter) => parameter + 1; 
+			const testFunction2 = (parameter) => parameter + 1;
+      const underTest = builder.withComponent(testFunction)
+                               .withComponent(testFunction2)
+                               .build(); 
 		
 			// act
-			underTest.register(testFunction)
-						   .register(testFunction2);
 			const components = underTest.registeredComponents();
 		
 			// assert
@@ -59,15 +123,16 @@ describe('StandardContainer type', function() {
 		it('should register a function with constant positioned parameter when passing it with a configuration', function() {
 			// arrange
 			const testFunction = parameter => parameter;
+      const underTest = builder.withComponent(testFunction)
+                               .withParameters(constant(1))
+                               .build();
 		
 			// act
-			underTest.register(testFunction, {
-				parameters: [ constant(1) ]
-			});
 			const components = underTest.registeredComponents();
 		
 			// assert
 			assert.include(components, {
+        name: undefined,
 				component: testFunction, 
 				configuration: {
 					parameters: [ constant(1) ]
@@ -76,17 +141,19 @@ describe('StandardContainer type', function() {
 		});
 	});
 	
-	describe('resolve(component: Object | String) function', function() {
+	describe('resolve({ component: Object, name: String }) function', function() {
 		const testFunction = (parameter) => parameter;
 		
 		jsdom();	// initialize jsdom
 		
 		it('should resolve an object by reference when registering it with default configuration', function() {
 			// arrange
-			underTest.register(testFunction);
+      const underTest = builder.withComponent(testFunction).build();
 		
 			// act
-			const result = underTest.resolve(testFunction);
+			const result = underTest.resolve({
+        component: testFunction
+      });
 		
 			// assert
 			assert.strictEqual(result, testFunction);
@@ -96,20 +163,24 @@ describe('StandardContainer type', function() {
 			// arrange
 		
 			// act
-			const callResolveFunction = () => underTest.resolve(testFunction);
+			const callResolveFunction = () => underTest.resolve({
+        component: testFunction
+      });
 		
 			// assert
-			assert.throws(callResolveFunction, Error, 'Trying to resolve a not registered component. Make sure every neccesary component has been registered before calling resolve function.')
+			assert.throws(callResolveFunction, Error, 'Trying to resolve a not registered component. Make sure every necessary component has been registered before calling resolve function.')
 		});
 		
 		it('should resolve a function with positioned parameter when registering it with positioned parameter', function() {
 			// arrange
-			underTest.register(testFunction, {
-				parameters: [ constant(1) ]
-			});
-		
+      const underTest = builder.withComponent(testFunction)
+                               .withParameters(constant(1))
+                               .build();
+      
 			// act
-			const resolvedFunction = underTest.resolve(testFunction);
+			const resolvedFunction = underTest.resolve({
+        component: testFunction
+      });
 		
 			// assert
 			assert.equal(resolvedFunction(), 1);
@@ -118,13 +189,15 @@ describe('StandardContainer type', function() {
 		it('should resolve a function with multiple positioned parameters when registering it with two positioned parameters', function() {
 			// arrange
 			const testFunction = (a, b) => a + b;
+      
+      const underTest = builder.withComponent(testFunction)
+                               .withParameters(constant(1), constant(2))
+                               .build();
 			
-			underTest.register(testFunction, {
-				parameters: [ constant(1), constant(2) ]
-			});
-		
 			// act
-			const resolvedFunction = underTest.resolve(testFunction);
+			const resolvedFunction = underTest.resolve({
+        component: testFunction
+      });
 		
 			// assert
 			assert.equal(resolvedFunction(), 3);
@@ -134,16 +207,14 @@ describe('StandardContainer type', function() {
 			// arrange
 			const id = value => value;
 			const testFunction = (func, b) => func() + b;
+      const underTest = builder.withComponent(id).withParameters(constant(2))
+                               .withComponent(testFunction).withParameters(resolve(id), constant(1))
+                               .build();
 			
-			underTest.register(id, { 
-        parameters: [ constant(2) ]
-      })
-      .register(testFunction, {
-        parameters: [ resolve(id), constant(1) ]
-      });
-		
 			// act
-			const resolvedFunction = underTest.resolve(testFunction);
+			const resolvedFunction = underTest.resolve({
+        component: testFunction
+      });
 		
 			// assert
 			assert.equal(resolvedFunction(), 3);
@@ -160,12 +231,14 @@ describe('StandardContainer type', function() {
 			};
 			const renderer = TestUtils.createRenderer();
 			
-			underTest.register(TestComponent, {
-				parameters: [ constant(3) ]
-			});
-		
+      const underTest = builder.withComponent(TestComponent)
+                               .withParameters(constant(3))
+                               .build();
+
 			// act
-			const ResolvedComponent = underTest.resolve(TestComponent);
+			const ResolvedComponent = underTest.resolve({
+        component: TestComponent
+      });
 			renderer.render(<ResolvedComponent />);
 			const component = renderer.getRenderOutput();
 		
@@ -180,17 +253,11 @@ describe('StandardContainer type', function() {
 			const id = (parameter) => parameter;
 			const sum = (a, b) => a + b;
 			const sumFunction = (func, b) => func() + b;
-			
-			underTest
-				.register(id, {
-					parameters: [ constant(2) ],
-				})
-				.register(sum, {
-					parameters: [ constant(1), constant(2) ]
-				})
-				.register(sumFunction, {
-					parameters: [ resolve(sum), 3 ]
-				});
+      
+      const underTest = builder.withComponent(id).withParameters(constant(2))
+                               .withComponent(sum).withParameters(constant(1), constant(2))
+                               .withComponent(sumFunction).withParameters(resolve(sum), 3)
+                               .build();
 		
 			// act
 			const resolvedComponents = underTest.resolveAll();
