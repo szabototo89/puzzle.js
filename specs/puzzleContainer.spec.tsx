@@ -2,15 +2,15 @@ import PuzzleContainer from 'containers/react/puzzleContainer';
 import StandardContainer from 'standardContainer';
 import ConstantValueResolver from 'resolvers/constantValueResolver';
 import ValueResolver from 'resolvers/valueResolver';
-import React from 'react';
+import * as React from 'react';
 import { assert } from 'chai';
 import { Components, Component, Argument, ConstructorFunction, Constant, Parameter, Reference } from 'containers/react/containerDefinitions';
 
 describe('PuzzleContainer class', function() {
 
-  class LabelStub extends React.Component { }
-  class TextBoxStub extends React.Component { }
-  class HeaderStub extends React.Component { }
+  class LabelStub extends React.Component<any, any> { }
+  class TextBoxStub extends React.Component<any, any> { }
+  class HeaderStub extends React.Component<any, any> { }
 
   describe('getConfiguration() function', function() {
     it('should get configuration through constructor parameters when a complex configuration has been passed', function() {

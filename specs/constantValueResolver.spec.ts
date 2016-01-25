@@ -1,13 +1,10 @@
-/* global it */
-/* global describe */
+import { assert } from 'chai';
 
 import ConstantValueResolver from 'resolvers/constantValueResolver';
 import AbstractResolver from 'resolvers/abstractResolver'; 
 import { Constant } from 'parameterConfigurations';
-import { assert } from 'chai';
 
 describe('ConstantValueResolver type', function() {
-	
 	it('should implement AbstractResolver type', function() {
 		// arrange
 		const underTest = new ConstantValueResolver();

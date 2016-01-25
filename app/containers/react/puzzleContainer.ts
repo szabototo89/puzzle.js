@@ -3,15 +3,22 @@ import StandardContainer from 'standardContainer';
 import { Component } from 'containers/react/containerDefinitions';
 import { Constant, Value } from 'parameterConfigurations';
 import ValueResolver from 'resolvers/valueResolver';
+import { IContainer } from "container";
 
 class PuzzleContainer {
-  constructor(configuration, container = new StandardContainer([ new ValueResolver() ]), configurationResolver = new ReactConfigurationResolver()) {
+  private configuration: any;
+  private container: IContainer;
+  private isObjectGraphReady: boolean;
+
+  constructor(configuration: any,
+              container: IContainer = new StandardContainer([ new ValueResolver() ]),
+              configurationResolver = new ReactConfigurationResolver()) {
     this.configuration = configurationResolver.resolve(configuration);
     this.container = container;
     this.isObjectGraphReady = false;
   }
   
-  createObjectGraph(container, configuration) {
+  createObjectGraph(container: IContainer, configuration) {
     function getArgumentConstantValue(config) {
       if (config.typeOf !== 'Constant') {
         return null;
@@ -63,13 +70,13 @@ class PuzzleContainer {
       
       return {
         position,
-        value: argumentValues.reduce((previousValue, { name, value }) => Object.assign({}, previousValue, {
+        value: argumentValues.reduce((previousValue, { name, value }) => (Object as any).assign({}, previousValue, {
           [name]: value
         }), { })
       };
     }
     
-    function instantiateValue(value) {
+    function instantiateValue(value: Constant<any>): Value<any> {
       if (value.constructor === Constant) {
         return value;
       }
@@ -123,7 +130,7 @@ class PuzzleContainer {
   }
   
   getConfiguration() {
-    return Object.assign({ }, this.configuration);
+    return (Object as any).assign({ }, this.configuration);
   }
   
   resolve(component) {

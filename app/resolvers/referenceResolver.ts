@@ -1,17 +1,19 @@
 import AbstractResolver from 'resolvers/abstractResolver';
 
 export default class ReferenceResolver extends AbstractResolver {
-  
+
+  private container: any;
+
   constructor(container) {
     super();
     this.container = container;
   }
   
-  canResolve(parameterConfiguration, resolvers) {
+  canResolve(parameterConfiguration: { resolveComponent: any }): boolean {
     return parameterConfiguration.resolveComponent;
   }
   
-  resolve(parameterConfiguration, resolvers) {
+  resolve(parameterConfiguration: { resolveComponent: any }, resolvers: Array<AbstractResolver>): any {
     const { resolveComponent }  = parameterConfiguration;
     const { container } = this;
     

@@ -11,7 +11,7 @@ class ReactConfigurationResolver {
   
   resolve(definition) {
     const { type: Type, props } = definition;
-    const args = Object.assign({ }, props, {
+    const args = (Object as any).assign({ }, props, {
       children: this.resolveChildren(props.children)
     });
     

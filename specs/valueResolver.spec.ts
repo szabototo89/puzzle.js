@@ -1,10 +1,8 @@
-/* global describe */
 import ValueResolver from 'resolvers/valueResolver';
 import { Value } from 'parameterConfigurations';
 import { assert } from 'chai';
 
 describe('ValueResolver type', function() {
-	
 	let underTest;
 	
 	beforeEach(function() {

@@ -1,26 +1,38 @@
-import React from 'react';
+import * as React from 'react';
 
-const isDefined = ((undefined) => {
-  return function isDefined(value) {
-    return value !== undefined && value !== null;
-  };
-})();
+export function isDefined<T>(value: T) {
+  return value !== undefined && value !== null;
+}
 
-class AbstractDefinition {
-  constructor(type) {
+class AbstractElementClass extends React.Component<any, any> { }
+
+class AbstractDefinition extends AbstractElementClass {
+  protected typeOf: string;
+
+  constructor(type: string) {
+    super();
     this.typeOf = type;
   }
 }
 
 export class Components extends AbstractDefinition {
-  constructor({ children }) {
+  public static typeName: string;
+  public children: Array<AbstractDefinition>
+
+  constructor({ children }: { children: Array<AbstractDefinition> }) {
     super(Components.typeName);
     this.children = children;
   }
 }
 
-
 export class Component extends AbstractDefinition {
+  public static typeName: string;
+
+  public type: any;
+  public lifeTime: string;
+  public name: string;
+  public children: Array<AbstractDefinition>
+
   constructor({ type, name, lifeTime, children }) {
     super(Component.typeName);
 
@@ -38,6 +50,9 @@ export class Component extends AbstractDefinition {
 }
 
 export class ConstructorFunction extends AbstractDefinition {
+  public static typeName: string;
+  public children: Array<AbstractDefinition>;
+
   constructor({ children }) {
     super(ConstructorFunction.typeName);
 
@@ -48,9 +63,14 @@ export class ConstructorFunction extends AbstractDefinition {
 }
 
 export class Argument extends AbstractDefinition {
+
+  public static typeName: string;
+  public position: number;
+  public children: Array<AbstractDefinition>;
+
   constructor({ position, children, value }) {
     super(Argument.typeName);
-    this.position = Number.parseInt(position);
+    this.position = (Number as any).parseInt(position);
     if (isDefined(children)) {
       this.children = children;
     }
@@ -58,6 +78,11 @@ export class Argument extends AbstractDefinition {
 }
 
 export class Constant extends AbstractDefinition {
+
+  public static typeName: string;
+  public value: string;
+  public name: string;
+
   constructor({ value, name }) {
     super(Constant.typeName);
     this.value = value;
@@ -69,6 +94,10 @@ export class Constant extends AbstractDefinition {
 }
 
 export class Reference extends AbstractDefinition {
+  public static typeName: string;
+  public to: any;
+  public name: string;
+
   constructor({ name, to }) {
     super(Reference.typeName);
     this.to = to;
@@ -80,6 +109,9 @@ export class Reference extends AbstractDefinition {
 }
 
 export class Parameter extends AbstractDefinition {
+  public static typeName: string;
+  public children: Array<AbstractDefinition>;
+
   constructor({ children }) {
     super(Parameter.typeName);
     
